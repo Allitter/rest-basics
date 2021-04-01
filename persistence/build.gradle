@@ -1,0 +1,9 @@
+dependencies {
+    implementation 'org.springframework:spring-web:5.3.5'
+    implementation 'org.springframework:spring-webmvc:5.3.5'
+
+    implementation 'org.springframework:spring-jdbc:5.3.5'
+    implementation 'com.zaxxer:HikariCP:3.2.0'
+    implementation 'com.h2database:h2:1.4.200'
+    implementation 'org.postgresql:postgresql:42.2.19'
+}
