@@ -11,8 +11,10 @@ import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.stream.CertificateStream;
 import com.epam.esm.service.stream.impl.CertificateStreamImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -63,6 +65,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
+    @Transactional
     public CertificateDto update(CertificateDto dto) {
         Optional<Certificate> optionalOld = repository.queryFirst(new CertificateByIdSpecification(dto.getId()));
         if (optionalOld.isEmpty()) {
@@ -72,11 +75,11 @@ public class CertificateServiceImpl implements CertificateService {
         Certificate old = optionalOld.get();
         Certificate updated = Certificate.Builder.merge(old, dto);
         List<Tag> tags = updated.getTags();
-        List<Tag> retrievedTags = retrieveTagsFromRepo(tags);
+        List<Tag> ensuredTags = ensureTagsInRepo(tags);
 
         updated = new Certificate.Builder(updated)
                 .setLastUpdateDate(LocalDate.now())
-                .setTags(retrievedTags)
+                .setTags(ensuredTags)
                 .build();
 
         updated = repository.update(updated);
@@ -84,8 +87,11 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
+    @Transactional
     public CertificateDto add(CertificateDto dto) {
-        Certificate certificate = new Certificate.Builder(dto).build();
+        List<Tag> tags = dto.getTags() != null ? ensureTagsInRepo(dto.getTags()) : Collections.emptyList();
+        Certificate certificate = new Certificate.Builder(dto).setTags(tags).build();
+
         certificate = repository.add(certificate);
         return new CertificateDto(certificate);
     }
@@ -95,10 +101,10 @@ public class CertificateServiceImpl implements CertificateService {
         return repository.remove(id);
     }
 
-    private List<Tag> retrieveTagsFromRepo(List<Tag> tags) {
+    private List<Tag> ensureTagsInRepo(List<Tag> tags) {
         for (int i = 0; i < tags.size(); i++) {
             Tag tag = tags.get(i);
-            var specification = new TagByNameOrIdSpecification(tag.getName(), tag.getId());
+            Specification<Tag> specification = new TagByNameOrIdSpecification(tag.getName(), tag.getId());
             Optional<Tag> optional = tagRepository.queryFirst(specification);
             tag = optional.isPresent() ? optional.get() : tagRepository.add(tag);
             tags.set(i, tag);
@@ -108,7 +114,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public List<Certificate> findCertificatesByQueryObject(CertificateQueryObject queryObject) {
+    public List<CertificateDto> findCertificatesByQueryObject(CertificateQueryObject queryObject) {
         CertificateStream stream = null;
         if (nonNull(queryObject.getName())) {
             stream = findByName(queryObject.getName());

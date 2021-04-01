@@ -32,7 +32,14 @@ class CertificateRepositoryTest {
     private static final int THIRD_TAG_INDEX = 2;
     private static final int FOURTH_TAG_INDEX = 3;
     private static final int SECOND_TAG_INDEX = 1;
-    private static final Certificate FIFTH_CERTIFICATE = new Certificate(5, "fifth certificate", "detailed description for fifth certificate", 200, 730, LocalDate.of(2020, 12, 21), LocalDate.of(2020, 12, 31));
+    private static final Certificate FIFTH_CERTIFICATE
+            = new Certificate.Builder()
+            .setId(5).setName("fifth certificate")
+            .setDescription("detailed description for fifth certificate")
+            .setPrice(200).setDuration(730)
+            .setCreateDate(LocalDate.of(2020, 12, 21))
+            .setLastUpdateDate(LocalDate.of(2020, 12, 31)).build();
+
     private static final List<Tag> tags = List.of(
             new Tag(1, "first tag"),
             new Tag(2, "second tag"),
@@ -40,22 +47,48 @@ class CertificateRepositoryTest {
             new Tag(4, "fourth tag")
     );
     private static final List<Certificate> certificates = List.of(
-            new Certificate(1, "first certificate", "detailed description for first certificate", 200, 365, LocalDate.of(2021, 1, 21), LocalDate.of(2021, 2, 21),
-                    tags.get(FIRST_TAG_INDEX),
-                    tags.get(THIRD_TAG_INDEX),
-                    tags.get(FOURTH_TAG_INDEX)
-            ),
-            new Certificate(2, "second certificate", "detailed description for second certificate", 150, 365, LocalDate.of(2021, 2, 21), LocalDate.of(2021, 3, 21),
-                    tags.get(SECOND_TAG_INDEX)
-            ),
-            new Certificate(3, "third certificate", "detailed description for third certificate", 80, 365, LocalDate.of(2021, 1, 21), LocalDate.of(2021, 2, 21),
-                    tags.get(SECOND_TAG_INDEX),
-                    tags.get(THIRD_TAG_INDEX)
-            ),
-            new Certificate(4, "fourth certificate", "detailed description for fourth certificate", 200, 730, LocalDate.of(2020, 12, 21), LocalDate.of(2020, 12, 31),
-                    tags.get(FIRST_TAG_INDEX),
-                    tags.get(THIRD_TAG_INDEX)
-            )
+            new Certificate.Builder()
+                    .setId(1).setName("first certificate")
+                    .setDescription("detailed description for first certificate")
+                    .setPrice(200).setDuration(365)
+                    .setCreateDate(LocalDate.of(2021, 1, 21))
+                    .setLastUpdateDate(LocalDate.of(2021, 2, 21))
+                    .setTags(List.of(
+                            tags.get(FIRST_TAG_INDEX),
+                            tags.get(THIRD_TAG_INDEX),
+                            tags.get(FOURTH_TAG_INDEX)))
+                    .build(),
+
+            new Certificate.Builder()
+                    .setId(2).setName("second certificate")
+                    .setDescription("detailed description for second certificate")
+                    .setPrice(150).setDuration(365)
+                    .setCreateDate(LocalDate.of(2021, 2, 21))
+                    .setLastUpdateDate(LocalDate.of(2021, 3, 21))
+                    .setTags(List.of(tags.get(SECOND_TAG_INDEX)))
+                    .build(),
+
+            new Certificate.Builder()
+                    .setId(3).setName("third certificate")
+                    .setDescription("detailed description for third certificate")
+                    .setPrice(80).setDuration(365)
+                    .setCreateDate(LocalDate.of(2021, 1, 21))
+                    .setLastUpdateDate(LocalDate.of(2021, 2, 21))
+                    .setTags(List.of(
+                            tags.get(SECOND_TAG_INDEX),
+                            tags.get(THIRD_TAG_INDEX)))
+                    .build(),
+
+            new Certificate.Builder()
+                    .setId(4).setName("fourth certificate")
+                    .setDescription("detailed description for fourth certificate")
+                    .setPrice(200).setDuration(730)
+                    .setCreateDate(LocalDate.of(2020, 12, 21))
+                    .setLastUpdateDate(LocalDate.of(2020, 12, 31))
+                    .setTags(List.of(
+                            tags.get(FIRST_TAG_INDEX),
+                            tags.get(THIRD_TAG_INDEX)))
+                    .build()
     );
 
 
@@ -90,7 +123,8 @@ class CertificateRepositoryTest {
     @Order(2)
     void testUpdateShouldUpdateCertificateTIfCertificateIsAlreadyExist() {
         Certificate expected = FIFTH_CERTIFICATE;
-        expected.setDescription("new description");
+        expected = new Certificate.Builder(expected)
+                .setDescription("new description").build();
 
         Certificate actual = certificateRepository.update(expected);
 

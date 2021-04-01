@@ -5,6 +5,8 @@ import com.epam.esm.model.Tag;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 public class CertificateDto {
     private int id;
@@ -104,5 +106,39 @@ public class CertificateDto {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CertificateDto that = (CertificateDto) o;
+        return id == that.id
+                && price == that.price
+                && duration == that.duration
+                && Objects.equals(name, that.name)
+                && Objects.equals(description, that.description)
+                && Objects.equals(createDate, that.createDate)
+                && Objects.equals(lastUpdateDate, that.lastUpdateDate)
+                && Objects.equals(tags, that.tags);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, price, duration, createDate, lastUpdateDate, tags);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", CertificateDto.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("description='" + description + "'")
+                .add("price=" + price)
+                .add("duration=" + duration)
+                .add("createDate=" + createDate)
+                .add("lastUpdateDate=" + lastUpdateDate)
+                .add("tags=" + tags)
+                .toString();
     }
 }

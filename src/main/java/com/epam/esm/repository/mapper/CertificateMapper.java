@@ -18,8 +18,8 @@ public class CertificateMapper implements RowMapper<Certificate> {
         int duration = rs.getInt("duration");
         String name = rs.getString("name");
         String description = rs.getString("description");
-        LocalDate createDate = rs.getDate("create_date").toLocalDate();
-        LocalDate lastUpdateDate = rs.getDate("last_update_date").toLocalDate();
+        LocalDate createDate = rs.getObject("create_date", LocalDate.class);
+        LocalDate lastUpdateDate = rs.getObject("last_update_date", LocalDate.class);
 
         return new Certificate.Builder()
                 .setId(id)

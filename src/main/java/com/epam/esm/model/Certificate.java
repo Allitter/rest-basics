@@ -5,7 +5,8 @@ import com.epam.esm.controller.dto.CertificateDto;
 import java.time.LocalDate;
 import java.util.*;
 
-import static java.util.Objects.*;
+import static java.util.Objects.hash;
+import static java.util.Objects.nonNull;
 
 public class Certificate extends Entity {
     private final String name;
@@ -24,7 +25,7 @@ public class Certificate extends Entity {
         this.duration = builder.duration;
         this.createDate = builder.createDate;
         this.lastUpdateDate = builder.lastUpdateDate;
-        this.tags = builder.tags;
+        this.tags = Collections.unmodifiableList(builder.tags);
     }
 
     public String getName() {

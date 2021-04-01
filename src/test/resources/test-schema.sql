@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS tag;
 create TABLE tag
 (
     id   INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    name VARCHAR(255)
+    name VARCHAR(255) NOT NULL UNIQUE
 );
 
 DROP TABLE IF EXISTS certificate_tag;

@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS tag;
 create TABLE tag
 (
     id   INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    name VARCHAR(255)
+    name VARCHAR(255) NOT NULL UNIQUE
 );
 
 DROP TABLE IF EXISTS certificate_tag;
@@ -29,6 +29,7 @@ create TABLE certificate_tag
     CONSTRAINT pk_certificate_tag PRIMARY KEY (
         id_tag, id_certificate
     ),
+
     FOREIGN KEY (id_tag) REFERENCES tag (id) ON DELETE CASCADE,
     FOREIGN KEY (id_certificate) REFERENCES certificate (id) ON DELETE CASCADE
 );

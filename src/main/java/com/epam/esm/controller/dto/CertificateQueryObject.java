@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 public class CertificateQueryObject {
-    public static final CertificateQueryObject EMPTY = new CertificateQueryObject();
     private final String name;
     private final String tagName;
     private final String description;
@@ -17,14 +16,6 @@ public class CertificateQueryObject {
         this.description = description;
         this.sortName = sortName;
         this.sortDate = sortDate;
-    }
-
-    private CertificateQueryObject() {
-        this.name = null;
-        this.tagName = null;
-        this.description = null;
-        this.sortName = null;
-        this.sortDate = null;
     }
 
     public String getName() {

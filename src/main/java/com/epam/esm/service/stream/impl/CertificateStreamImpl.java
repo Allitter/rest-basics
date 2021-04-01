@@ -1,5 +1,6 @@
 package com.epam.esm.service.stream.impl;
 
+import com.epam.esm.controller.dto.CertificateDto;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.service.stream.CertificateStream;
 
@@ -22,8 +23,8 @@ public class CertificateStreamImpl implements CertificateStream {
     }
 
     @Override
-    public CertificateStream descriptionLike(String name) {
-        certificateStream = certificateStream.filter(certificate -> certificate.getDescription().contains(name));
+    public CertificateStream descriptionLike(String description) {
+        certificateStream = certificateStream.filter(certificate -> certificate.getDescription().contains(description));
         return this;
     }
 
@@ -38,26 +39,24 @@ public class CertificateStreamImpl implements CertificateStream {
 
     @Override
     public CertificateStream sortName(boolean asc) {
-        if (asc) {
-            certificateStream = certificateStream.sorted(Comparator.comparing(Certificate::getName));
-        } else {
-            certificateStream = certificateStream.sorted((a, b) -> b.getName().compareTo(a.getName()));
-        }
+        certificateStream = asc
+                ? certificateStream.sorted(Comparator.comparing(Certificate::getName))
+                : certificateStream.sorted((a, b) -> b.getName().compareTo(a.getName()));
+
         return this;
     }
 
     @Override
     public CertificateStream sortCreateDate(boolean asc) {
-        if (asc) {
-            certificateStream = certificateStream.sorted(Comparator.comparing(Certificate::getCreateDate));
-        } else {
-            certificateStream = certificateStream.sorted((a, b) -> b.getCreateDate().compareTo(a.getCreateDate()));
-        }
+        certificateStream = asc
+                ? certificateStream.sorted(Comparator.comparing(Certificate::getCreateDate))
+                : certificateStream.sorted((a, b) -> b.getCreateDate().compareTo(a.getCreateDate()));
+
         return this;
     }
 
     @Override
-    public List<Certificate> get() {
-        return certificateStream.collect(Collectors.toList());
+    public List<CertificateDto> get() {
+        return certificateStream.map(CertificateDto::new).collect(Collectors.toList());
     }
 }

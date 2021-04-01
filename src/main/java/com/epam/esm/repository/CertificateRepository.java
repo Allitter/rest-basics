@@ -18,9 +18,9 @@ import java.util.List;
 public class CertificateRepository extends AbstractRepository<Certificate> {
     private static final String TABLE_NAME = "certificate";
     private static final String INSERT_QUERY = "INSERT INTO certificate (name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, ?, ?);";
-    private static final String UPDATE_QUERY = "UPDATE certificate SET `name` = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = ? WHERE id = ?;";
-    private static final String ADD_TAG_QUERY = "INSERT INTO certificate_tag(id_certificate, id_tag) values(?, ?);";
-    private static final String REMOVE_CERTIFICATE_TAGS_QUERY = "DELETE FROM certificate_tag where id_certificate = ?;";
+    private static final String UPDATE_QUERY = "UPDATE certificate SET name = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = ? WHERE id = ?;";
+    private static final String ADD_TAG_QUERY = "INSERT INTO certificate_tag(id_certificate, id_tag) VALUES (?, ?);";
+    private static final String REMOVE_CERTIFICATE_TAGS_QUERY = "DELETE FROM certificate_tag WHERE id_certificate = ?;";
 
 
     private final RowMapper<Tag> tagRowMapper;
@@ -46,24 +46,25 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
     @Override
     public Certificate add(Certificate certificate) {
         List<Object> fields = extractNonIdFields(certificate);
-        int id = insert(INSERT_QUERY, fields.toArray());
-        return this.queryFirst(new CertificateByIdSpecification(id)).orElseThrow(EntityNotFoundException::new);
+        int certificateId = insert(INSERT_QUERY, fields.toArray());
+        List<Tag> tags = certificate.getTags();
+        tags.forEach(tag -> jdbcTemplate.update(ADD_TAG_QUERY, certificateId, tag.getId()));
+
+        return this.queryFirst(new CertificateByIdSpecification(certificateId)).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
     public Certificate update(Certificate certificate) {
         List<Object> fields = extractNonIdFields(certificate);
-        int id = certificate.getId();
-        fields.add(id);
+        int certificateId = certificate.getId();
+        fields.add(certificateId);
         jdbcTemplate.update(UPDATE_QUERY, fields.toArray());
 
-        jdbcTemplate.update(REMOVE_CERTIFICATE_TAGS_QUERY, id);
+        jdbcTemplate.update(REMOVE_CERTIFICATE_TAGS_QUERY, certificateId);
         List<Tag> tags = certificate.getTags();
-        for (Tag tag : tags) {
-            jdbcTemplate.update(ADD_TAG_QUERY, id, tag.getId());
-        }
+        tags.forEach(tag -> jdbcTemplate.update(ADD_TAG_QUERY, certificateId, tag.getId()));
 
-        return this.queryFirst(new CertificateByIdSpecification(id)).orElseThrow(EntityNotFoundException::new);
+        return this.queryFirst(new CertificateByIdSpecification(certificateId)).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -72,9 +73,9 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
 
         List<Certificate> taggedCertificates = new ArrayList<>();
 
-        certificates.forEach(c -> {
-            List<Tag> tags = getCertificateTags(c.getId());
-            Certificate taggedCertificate = new Certificate.Builder(c).setTags(tags).build();
+        certificates.forEach(certificate -> {
+            List<Tag> tags = getCertificateTags(certificate.getId());
+            Certificate taggedCertificate = new Certificate.Builder(certificate).setTags(tags).build();
             taggedCertificates.add(taggedCertificate);
         });
 

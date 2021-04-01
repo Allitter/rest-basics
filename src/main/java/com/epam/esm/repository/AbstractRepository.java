@@ -1,9 +1,9 @@
 package com.epam.esm.repository;
 
-
 import com.epam.esm.model.Entity;
 import com.epam.esm.repository.specification.Specification;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -25,16 +25,19 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
 
     protected int insert(String query, Object...params) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
+
+        PreparedStatementCreator psc = connection -> {
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             for (int i = 1; i <= params.length; i++) {
                 ps.setObject(i, params[i - 1]);
             }
 
             return ps;
-        }, keyHolder);
+        };
 
-        return (int) keyHolder.getKey();
+        jdbcTemplate.update(psc, keyHolder);
+
+        return (int) keyHolder.getKeys().get("id");
     }
 
     @Override
