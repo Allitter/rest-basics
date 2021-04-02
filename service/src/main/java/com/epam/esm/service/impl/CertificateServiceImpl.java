@@ -137,12 +137,12 @@ public class CertificateServiceImpl implements CertificateService {
 
         if (nonNull(queryObject.getSortDate())) {
             boolean asc = queryObject.getSortDate().trim().toLowerCase(Locale.ROOT).contains(ASC_SORT);
-            stream.sortName(asc);
+            stream.sortCreateDate(asc);
         }
 
         if (nonNull(queryObject.getSortName())) {
             boolean asc = queryObject.getSortName().trim().toLowerCase(Locale.ROOT).contains(ASC_SORT);
-            stream.sortCreateDate(asc);
+            stream.sortName(asc);
         }
 
         return stream.get();
