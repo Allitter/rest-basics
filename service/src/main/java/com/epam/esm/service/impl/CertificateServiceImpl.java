@@ -1,18 +1,16 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.dto.CertificateQueryObject;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.ValidationException;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.MainRepository;
 import com.epam.esm.repository.specification.*;
+import com.epam.esm.service.CertificateQueryObject;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.stream.CertificateStream;
 import com.epam.esm.service.stream.impl.CertificateStreamImpl;
-import com.epam.esm.util.DtoConverter;
-import com.epam.esm.validation.CertificateDtoValidator;
+import com.epam.esm.validator.CertificateValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,21 +24,20 @@ public class CertificateServiceImpl implements CertificateService {
     private static final String ASC_SORT = "asc";
     private final MainRepository<Tag> tagRepository;
     private final MainRepository<Certificate> repository;
-    private final CertificateDtoValidator validator;
+    private final CertificateValidator validator;
 
     public CertificateServiceImpl(MainRepository<Certificate> repository,
                                   MainRepository<Tag> tagRepository,
-                                  CertificateDtoValidator validator) {
+                                  CertificateValidator validator) {
         this.repository = repository;
         this.tagRepository = tagRepository;
         this.validator = validator;
     }
 
     @Override
-    public CertificateDto findById(int id) {
+    public Certificate findById(int id) {
         Optional<Certificate> optionalCertificate = repository.queryFirst(new CertificateByIdSpecification(id));
-        Certificate certificate = optionalCertificate.orElseThrow(EntityNotFoundException::new);
-        return DtoConverter.certificateToDto(certificate);
+        return optionalCertificate.orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -69,17 +66,16 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     @Transactional
-    public CertificateDto update(CertificateDto dto) {
-        Map<String, String> validations = validator.validateForUpdate(dto);
+    public Certificate update(Certificate certificate) {
+        Map<String, String> validations = validator.validateForUpdate(certificate);
         if (!validations.isEmpty()) {
             throw new ValidationException(validations);
         }
 
-        Optional<Certificate> optional = repository.queryFirst(new CertificateByIdSpecification(dto.getId()));
+        Optional<Certificate> optional = repository.queryFirst(new CertificateByIdSpecification(certificate.getId()));
         Certificate oldCertificate = optional.orElseThrow(EntityNotFoundException::new);
 
-        Certificate certificateFromDto = DtoConverter.dtoToCertificate(dto);
-        Certificate updatedCertificate = Certificate.Builder.merge(oldCertificate, certificateFromDto);
+        Certificate updatedCertificate = Certificate.Builder.merge(oldCertificate, certificate);
         List<Tag> tags = updatedCertificate.getTags();
         List<Tag> ensuredTags = ensureTagsInRepo(tags);
 
@@ -89,27 +85,28 @@ public class CertificateServiceImpl implements CertificateService {
                 .build();
 
         updatedCertificate = repository.update(updatedCertificate);
-        return DtoConverter.certificateToDto(updatedCertificate);
+        return updatedCertificate;
     }
 
     @Override
     @Transactional
-    public CertificateDto add(CertificateDto dto) {
-        Map<String, String> validations = validator.validateForCreate(dto);
+    public Certificate add(Certificate certificate) {
+        Map<String, String> validations = validator.validateForCreate(certificate);
         if (!validations.isEmpty()) {
             throw new ValidationException(validations);
         }
 
-        Certificate certificate = DtoConverter.dtoToCertificate(dto);
-        List<Tag> tags = dto.getTags() != null ? ensureTagsInRepo(certificate.getTags()) : Collections.emptyList();
-        Certificate certificateFromDto = DtoConverter.dtoToCertificate(dto);
-        certificate = new Certificate.Builder(certificateFromDto)
+        List<Tag> tags = certificate.getTags() != null
+                ? ensureTagsInRepo(certificate.getTags())
+                : Collections.emptyList();
+
+        certificate = new Certificate.Builder(certificate)
                 .setCreateDate(LocalDate.now())
                 .setLastUpdateDate(LocalDate.now())
                 .setTags(tags).build();
 
         certificate = repository.add(certificate);
-        return DtoConverter.certificateToDto(certificate);
+        return certificate;
     }
 
     @Override
@@ -130,7 +127,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public List<CertificateDto> findCertificatesByQueryObject(CertificateQueryObject queryObject) {
+    public List<Certificate> findCertificatesByQueryObject(CertificateQueryObject queryObject) {
         CertificateStream stream = null;
         if (nonNull(queryObject.getName())) {
             stream = findByName(queryObject.getName());

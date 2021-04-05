@@ -1,10 +1,10 @@
-package com.epam.esm.validation.impl;
+package com.epam.esm.validator.impl;
 
-import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.dto.TagDto;
+import com.epam.esm.model.Certificate;
+import com.epam.esm.model.Tag;
 import com.epam.esm.util.ResourceBundleMessage;
-import com.epam.esm.validation.CertificateDtoValidator;
-import com.epam.esm.validation.TagDtoValidator;
+import com.epam.esm.validator.CertificateValidator;
+import com.epam.esm.validator.TagValidator;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -12,43 +12,45 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class CertificateDtoValidatorImpl implements CertificateDtoValidator {
+public class CertificateValidatorImpl implements CertificateValidator {
     private static final String DURATION_ATTRIBUTE = "duration";
     private static final String PRICE_ATTRIBUTE = "price";
     private static final String DESCRIPTION_ATTRIBUTE = "description";
     private static final String NAME_ATTRIBUTE = "certificate_name";
-    private final TagDtoValidator tagDtoValidator;
+    private final TagValidator tagValidator;
 
-    public CertificateDtoValidatorImpl(TagDtoValidator tagDtoValidator) {
-        this.tagDtoValidator = tagDtoValidator;
+    public CertificateValidatorImpl(TagValidator tagValidator) {
+        this.tagValidator = tagValidator;
     }
 
-    @Override public Map<String, String> validateForCreate(CertificateDto dto) {
+    @Override
+    public Map<String, String> validateForCreate(Certificate certificate) {
         Map<String, String> result = new HashMap<>();
-        result.putAll(validateName(dto.getName()));
-        result.putAll(validateDescription(dto.getDescription()));
-        result.putAll(validatePrice(dto.getPrice()));
-        result.putAll(validateDuration(dto.getDuration()));
-        result.putAll(validateTags(dto.getTags()));
+        result.putAll(validateName(certificate.getName()));
+        result.putAll(validateDescription(certificate.getDescription()));
+        result.putAll(validatePrice(certificate.getPrice()));
+        result.putAll(validateDuration(certificate.getDuration()));
+        result.putAll(validateTags(certificate.getTags()));
 
         return result;
     }
 
-    @Override public Map<String, String> validateForUpdate(CertificateDto dto) {
+    @Override
+    public Map<String, String> validateForUpdate(Certificate certificate) {
         Map<String, String> result = new HashMap<>();
-        if (!isEmpty(dto.getName())) {
-            result.putAll(validateName(dto.getName()));
+        if (!isEmpty(certificate.getName())) {
+            result.putAll(validateName(certificate.getName()));
         }
-        if (!isEmpty(dto.getDescription())) {
-            result.putAll(validateDescription(dto.getDescription()));
+        if (!isEmpty(certificate.getDescription())) {
+            result.putAll(validateDescription(certificate.getDescription()));
         }
-        if (dto.getDuration() != 0) {
-            result.putAll(validateDuration(dto.getDuration()));
+        if (certificate.getDuration() != 0) {
+            result.putAll(validateDuration(certificate.getDuration()));
         }
-        if (dto.getTags() != null && !dto.getTags().isEmpty()) {
-            result.putAll(validateTags(dto.getTags()));
+        if (certificate.getTags() != null && !certificate.getTags().isEmpty()) {
+            result.putAll(validateTags(certificate.getTags()));
         }
-        result.putAll(validatePrice(dto.getPrice()));
+        result.putAll(validatePrice(certificate.getPrice()));
 
         return result;
     }
@@ -101,11 +103,11 @@ public class CertificateDtoValidatorImpl implements CertificateDtoValidator {
         return result;
     }
 
-    public Map<String, String> validateTags(List<TagDto> tags) {
+    public Map<String, String> validateTags(List<Tag> tags) {
         Map<String, String> result = new HashMap<>();
 
-        for (TagDto tag : tags) {
-            Map<String, String> validations = tagDtoValidator.validate(tag);
+        for (Tag tag : tags) {
+            Map<String, String> validations = tagValidator.validate(tag);
             if (!validations.isEmpty()) {
                 result.putAll(validations);
             }

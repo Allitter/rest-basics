@@ -1,6 +1,6 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.TagDto;
+import com.epam.esm.model.Tag;
 
 import java.util.List;
 
@@ -13,24 +13,24 @@ public interface TagService {
      * Find by id tag dto.
      *
      * @param id the id to search
-     * @return {@link TagDto}
+     * @return {@link Tag}
      */
-    TagDto findById(int id);
+    Tag findById(int id);
 
     /**
      * Finds all tags
      *
      * @return the list of all tags
      */
-    List<TagDto> findAll();
+    List<Tag> findAll();
 
     /**
      * Adds tag to repository.
      *
-     * @param dto the tag to be added
+     * @param tag the tag to be added
      * @return the added tag
      */
-    TagDto add(TagDto dto);
+    Tag add(Tag tag);
 
     /**
      * Remove boolean.

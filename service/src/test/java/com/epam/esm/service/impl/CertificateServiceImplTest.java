@@ -1,7 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
@@ -9,7 +7,7 @@ import com.epam.esm.repository.MainRepository;
 import com.epam.esm.repository.specification.*;
 import com.epam.esm.service.stream.CertificateStream;
 import com.epam.esm.service.stream.impl.CertificateStreamImpl;
-import com.epam.esm.validation.CertificateDtoValidator;
+import com.epam.esm.validator.CertificateValidator;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
@@ -49,23 +47,17 @@ class CertificateServiceImplTest {
             .setTags(new ArrayList<>(TAGS))
             .build();
 
-    public static CertificateDto getDtoEquivalentToCertificate() {
-        List<TagDto> tagDtos = TAGS.stream().map((t) -> new TagDto(t.getId(), t.getName())).collect(Collectors.toList());
-        return new CertificateDto(ID, NAME, DESCRIPTION, PRICE, DURATION, CREATE_DATE, LAST_UPDATE_DATE, tagDtos);
-    }
-
     @Test
     void testFindByIdShouldReturnCertificateWithQueriedIdIfSuchExist() {
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.queryFirst(Mockito.isA(CertificateByIdSpecification.class))).thenReturn(Optional.of(CERTIFICATE));
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
-        CertificateDto expected = getDtoEquivalentToCertificate();
 
-        CertificateDto actual = service.findById(ID);
+        Certificate actual = service.findById(ID);
 
-        assertEquals(expected, actual);
+        assertEquals(CERTIFICATE, actual);
     }
 
     @Test
@@ -73,7 +65,7 @@ class CertificateServiceImplTest {
         List<Certificate> certificates = Collections.emptyList();
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.query(Mockito.isA(CertificateAllSpecification.class))).thenReturn(certificates);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
         CertificateStream expected = new CertificateStreamImpl(certificates);
@@ -88,7 +80,7 @@ class CertificateServiceImplTest {
         List<Certificate> certificates = Collections.emptyList();
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.query(Mockito.isA(CertificateByTagNameSpecification.class))).thenReturn(certificates);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
         CertificateStream expected = new CertificateStreamImpl(certificates);
@@ -103,7 +95,7 @@ class CertificateServiceImplTest {
         List<Certificate> certificates = Collections.emptyList();
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.query(Mockito.isA(CertificateByNameSpecification.class))).thenReturn(certificates);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
         CertificateStream expected = new CertificateStreamImpl(certificates);
@@ -118,7 +110,7 @@ class CertificateServiceImplTest {
         List<Certificate> certificates = Collections.emptyList();
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.query(Mockito.isA(CertificateByDescriptionSpecification.class))).thenReturn(certificates);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
         CertificateStream expected = new CertificateStreamImpl(certificates);
@@ -130,63 +122,56 @@ class CertificateServiceImplTest {
 
     @Test
     void testAddShouldAddCertificateToRepository() {
-        CertificateDto expected = getDtoEquivalentToCertificate();
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
         Mockito.when(repository.add(Mockito.eq(CERTIFICATE))).thenReturn(CERTIFICATE);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
-        Mockito.when(validator.validateForCreate(expected)).thenReturn(Collections.emptyMap());
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
+        Mockito.when(validator.validateForCreate(CERTIFICATE)).thenReturn(Collections.emptyMap());
         Mockito.when(tagRepository.queryFirst(Mockito.isA(TagByNameSpecification.class))).thenReturn(Optional.empty());
         doAnswer(AdditionalAnswers.returnsFirstArg()).when(tagRepository).add(any());
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
 
-        CertificateDto actual = service.add(expected);
+        Certificate actual = service.add(CERTIFICATE);
 
-        assertEquals(expected, actual);
+        assertEquals(CERTIFICATE, actual);
     }
 
     @Test
     void TestUpdateShouldUpdateCertificate() {
-        CertificateDto dto = getDtoEquivalentToCertificate();
         int newPrice = 1000;
-        dto.setPrice(newPrice);
-        dto.setName(null);
         Certificate certificate = new Certificate.Builder(CERTIFICATE).setLastUpdateDate(LocalDate.now()).setPrice(newPrice).build();
-        CertificateDto expected = getDtoEquivalentToCertificate();
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
-        Mockito.when(validator.validateForCreate(expected)).thenReturn(Collections.emptyMap());
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
+        Mockito.when(validator.validateForCreate(certificate)).thenReturn(Collections.emptyMap());
         Mockito.when(repository.update(Mockito.eq(certificate))).thenReturn(certificate);
         Mockito.when(repository.queryFirst(Mockito.isA(CertificateByIdSpecification.class))).thenReturn(Optional.of(CERTIFICATE));
         Mockito.when(tagRepository.queryFirst(Mockito.isA(TagByNameSpecification.class))).thenReturn(Optional.empty());
         doAnswer(AdditionalAnswers.returnsFirstArg()).when(tagRepository).add(any());
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
-        expected.setPrice(newPrice);
 
-        CertificateDto actual = service.update(dto);
+        Certificate actual = service.update(certificate);
 
-        assertEquals(expected, actual);
+        assertEquals(certificate, actual);
     }
 
     @Test
     void TestUpdateShouldThrowExceptionIfCertificateNotPresent() {
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(validator.validateForCreate(Mockito.any())).thenReturn(Collections.emptyMap());
         Mockito.when(repository.queryFirst(Mockito.isA(CertificateByIdSpecification.class))).thenReturn(Optional.empty());
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
-        CertificateDto dto = getDtoEquivalentToCertificate();
 
-        assertThrows(EntityNotFoundException.class, () -> service.update(dto));
+        assertThrows(EntityNotFoundException.class, () -> service.update(CERTIFICATE));
     }
 
     @Test
     void testRemoveShouldReturnTrueIfRemoved() {
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.remove(ID)).thenReturn(true);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
 
@@ -197,7 +182,7 @@ class CertificateServiceImplTest {
     void testRemoveShouldReturnFalseIfNotRemoved() {
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateDtoValidator validator = Mockito.mock(CertificateDtoValidator.class);
+        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.remove(ID)).thenReturn(false);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
 

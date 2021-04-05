@@ -1,7 +1,6 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.dto.CertificateQueryObject;
+import com.epam.esm.model.Certificate;
 import com.epam.esm.service.stream.CertificateStream;
 
 import java.util.List;
@@ -15,9 +14,9 @@ public interface CertificateService {
      * Finds certificate by id.
      *
      * @param id the id
-     * @return {@link CertificateDto}
+     * @return {@link Certificate}
      */
-    CertificateDto findById(int id);
+    Certificate findById(int id);
 
     /**
      * Finds all certificates
@@ -53,18 +52,18 @@ public interface CertificateService {
     /**
      * Update certificate dto.
      *
-     * @param dto certificate to update
+     * @param certificate certificate to update
      * @return the updated certificate
      */
-    CertificateDto update(CertificateDto dto);
+    Certificate update(Certificate certificate);
 
     /**
      * Add certificate dto.
      *
-     * @param dto certificate to add
+     * @param certificate certificate to add
      * @return the added certificate
      */
-    CertificateDto add(CertificateDto dto);
+    Certificate add(Certificate certificate);
 
     /**
      * Remove boolean.
@@ -80,5 +79,5 @@ public interface CertificateService {
      * @param queryObject the query object
      * @return queried certificates
      */
-    List<CertificateDto> findCertificatesByQueryObject(CertificateQueryObject queryObject);
+    List<Certificate> findCertificatesByQueryObject(CertificateQueryObject queryObject);
 }

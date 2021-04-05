@@ -1,11 +1,11 @@
 package com.epam.esm.service.stream;
 
-import com.epam.esm.dto.CertificateDto;
+import com.epam.esm.model.Certificate;
 
 /**
  * The Certificate stream interface.
  */
-public interface CertificateStream extends ServiceStream<CertificateDto> {
+public interface CertificateStream extends ServiceStream<Certificate> {
 
     /**
      * Filters by certificate name.

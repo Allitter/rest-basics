@@ -1,7 +1,8 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.converter.DtoConverter;
 import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.dto.CertificateQueryObject;
+import com.epam.esm.service.CertificateQueryObject;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.service.CertificateService;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class CertificateController {
      * @return the list of queried certificates or all certificates if no params passed
      */
     @GetMapping()
-    public List<CertificateDto> findByQuery(CertificateQueryObject query) {
+    public List<Certificate> findByQuery(CertificateQueryObject query) {
         return certificateService.findCertificatesByQueryObject(query);
     }
 
@@ -40,7 +41,7 @@ public class CertificateController {
      * @return the {@link CertificateDto} of queried certificate
      */
     @GetMapping(value = "/{id}")
-    public CertificateDto findById(@PathVariable int id) {
+    public Certificate findById(@PathVariable int id) {
         return certificateService.findById(id);
     }
 
@@ -51,8 +52,9 @@ public class CertificateController {
      * @return the {@link CertificateDto} of added certificate
      */
     @PostMapping()
-    public CertificateDto add(@RequestBody CertificateDto dto) {
-        return certificateService.add(dto);
+    public Certificate add(@RequestBody CertificateDto dto) {
+        Certificate certificate = DtoConverter.dtoToCertificate(dto);
+        return certificateService.add(certificate);
     }
 
     /**
@@ -63,9 +65,10 @@ public class CertificateController {
      * @return the updated certificate {@link CertificateDto}
      */
     @PutMapping(value = "/{id}")
-    public CertificateDto update(@PathVariable int id, @RequestBody CertificateDto dto) {
+    public Certificate update(@PathVariable int id, @RequestBody CertificateDto dto) {
         dto.setId(id);
-        return certificateService.update(dto);
+        Certificate certificate = DtoConverter.dtoToCertificate(dto);
+        return certificateService.update(certificate);
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.ValidationException;
@@ -10,52 +9,46 @@ import com.epam.esm.repository.specification.TagAllSpecification;
 import com.epam.esm.repository.specification.TagByIdSpecification;
 import com.epam.esm.repository.specification.TagByNameSpecification;
 import com.epam.esm.service.TagService;
-import com.epam.esm.util.DtoConverter;
-import com.epam.esm.validation.TagDtoValidator;
+import com.epam.esm.validator.TagValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TagServiceImpl implements TagService {
     private final MainRepository<Tag> repository;
-    private final TagDtoValidator tagValidator;
+    private final TagValidator tagValidator;
 
-    public TagServiceImpl(MainRepository<Tag> repository, TagDtoValidator tagValidator) {
+    public TagServiceImpl(MainRepository<Tag> repository, TagValidator tagValidator) {
         this.repository = repository;
         this.tagValidator = tagValidator;
     }
 
     @Override
-    public TagDto findById(int id) {
+    public Tag findById(int id) {
         Optional<Tag> optionalTag = repository.queryFirst(new TagByIdSpecification(id));
-        Tag tag = optionalTag.orElseThrow(EntityNotFoundException::new);
-        return DtoConverter.tagToDto(tag);
+        return optionalTag.orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
-    public List<TagDto> findAll() {
-        List<Tag> tags = repository.query(new TagAllSpecification());
-        return tags.stream().map(DtoConverter::tagToDto).collect(Collectors.toList());
+    public List<Tag> findAll() {
+        return repository.query(new TagAllSpecification());
     }
 
     @Override
-    public TagDto add(TagDto dto) {
-        Map<String, String> validations = tagValidator.validate(dto);
+    public Tag add(Tag tag) {
+        Map<String, String> validations = tagValidator.validate(tag);
         if (!validations.isEmpty()) {
             throw new ValidationException(validations);
         }
 
-        if (repository.exists(new TagByNameSpecification(dto.getName()))) {
+        if (repository.exists(new TagByNameSpecification(tag.getName()))) {
             throw new EntityAlreadyExistsException();
         }
 
-        Tag tag = DtoConverter.dtoToTag(dto);
-        tag = repository.add(tag);
-        return DtoConverter.tagToDto(tag);
+        return repository.add(tag);
     }
 
     @Override

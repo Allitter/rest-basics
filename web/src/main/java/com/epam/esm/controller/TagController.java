@@ -1,6 +1,8 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.converter.DtoConverter;
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.model.Tag;
 import com.epam.esm.service.TagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,7 @@ public class TagController {
      * @return the list of all tags
      */
     @GetMapping()
-    public List<TagDto> findAll() {
+    public List<Tag> findAll() {
         return tagService.findAll();
     }
 
@@ -37,7 +39,7 @@ public class TagController {
      * @return the tag with queried id {@link TagDto}
      */
     @GetMapping(value = "/{id}")
-    public TagDto findById(@PathVariable int id) {
+    public Tag findById(@PathVariable int id) {
         return tagService.findById(id);
     }
 
@@ -48,8 +50,9 @@ public class TagController {
      * @return the added tag {@link TagDto}
      */
     @PostMapping()
-    public TagDto add(@RequestBody TagDto dto) {
-        return tagService.add(dto);
+    public Tag add(@RequestBody TagDto dto) {
+        Tag tag = DtoConverter.dtoToTag(dto);
+        return tagService.add(tag);
     }
 
     /**
