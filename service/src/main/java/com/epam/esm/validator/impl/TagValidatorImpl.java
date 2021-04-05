@@ -11,6 +11,8 @@ import java.util.Map;
 @Component
 public class TagValidatorImpl implements TagValidator {
     private static final String NAME_ATTRIBUTE = "tag_name";
+    private static final int MIN_NAME_LENGTH = 2;
+    private static final int MAX_NAME_LENGTH = 64;
 
     @Override
     public Map<String, String> validate(Tag tag) {
@@ -23,7 +25,7 @@ public class TagValidatorImpl implements TagValidator {
         }
 
         name = name.trim();
-        if (name.length() < 2 || name.length() > 64) {
+        if (name.length() < MIN_NAME_LENGTH || name.length() > MAX_NAME_LENGTH) {
             result.put(NAME_ATTRIBUTE, ResourceBundleMessage.TAG_NAME_FORMAT);
         }
 

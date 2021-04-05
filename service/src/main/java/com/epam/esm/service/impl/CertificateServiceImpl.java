@@ -1,21 +1,23 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.exception.EntityNotFoundException;
-import com.epam.esm.exception.ValidationException;
+import com.epam.esm.exception.ValidationError;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.MainRepository;
 import com.epam.esm.repository.specification.*;
+import com.epam.esm.repository.specification.impl.*;
 import com.epam.esm.service.CertificateQueryObject;
 import com.epam.esm.service.CertificateService;
-import com.epam.esm.service.stream.CertificateStream;
-import com.epam.esm.service.stream.impl.CertificateStreamImpl;
 import com.epam.esm.validator.CertificateValidator;
+import org.apache.logging.log4j.util.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 
@@ -41,63 +43,59 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public CertificateStream findAll() {
-        List<Certificate> certificates = repository.query(new CertificateAllSpecification());
-        return new CertificateStreamImpl(certificates);
+    public List<Certificate> findAll() {
+        return repository.query(new CertificateAllSpecification());
     }
 
     @Override
-    public CertificateStream findByTagName(String tagName) {
-        List<Certificate> certificates = repository.query(new CertificateByTagNameSpecification(tagName));
-        return new CertificateStreamImpl(certificates);
+    public List<Certificate> findByTagName(String tagName) {
+        return repository.query(new CertificateByTagNameSpecification(tagName));
     }
 
     @Override
-    public CertificateStream findByName(String name) {
-        List<Certificate> certificates = repository.query(new CertificateByNameSpecification(name));
-        return new CertificateStreamImpl(certificates);
+    public List<Certificate> findByName(String name) {
+        return repository.query(new CertificateByNameSpecification(name));
     }
 
     @Override
-    public CertificateStream findByDescription(String description) {
-        List<Certificate> certificates = repository.query(new CertificateByDescriptionSpecification(description));
-        return new CertificateStreamImpl(certificates);
+    public List<Certificate> findByDescription(String description) {
+        return repository.query(new CertificateByDescriptionSpecification(description));
     }
 
     @Override
     @Transactional
     public Certificate update(Certificate certificate) {
-        Map<String, String> validations = validator.validateForUpdate(certificate);
-        if (!validations.isEmpty()) {
-            throw new ValidationException(validations);
-        }
+        validateForUpdate(certificate);
 
         Optional<Certificate> optional = repository.queryFirst(new CertificateByIdSpecification(certificate.getId()));
         Certificate oldCertificate = optional.orElseThrow(EntityNotFoundException::new);
 
-        Certificate updatedCertificate = Certificate.Builder.merge(oldCertificate, certificate);
-        List<Tag> tags = updatedCertificate.getTags();
+        Certificate certificateToUpdate = Certificate.Builder.merge(oldCertificate, certificate);
+        List<Tag> tags = new ArrayList<>(certificateToUpdate.getTags());
         List<Tag> ensuredTags = ensureTagsInRepo(tags);
 
-        updatedCertificate = new Certificate.Builder(updatedCertificate)
+        certificateToUpdate = new Certificate.Builder(certificateToUpdate)
                 .setLastUpdateDate(LocalDate.now())
                 .setTags(ensuredTags)
                 .build();
 
-        updatedCertificate = repository.update(updatedCertificate);
-        return updatedCertificate;
+        return repository.update(certificateToUpdate);
+    }
+
+    private void validateForUpdate(Certificate certificate) {
+        Map<String, String> validations = validator.validateForUpdate(certificate);
+        if (!validations.isEmpty()) {
+            throw new ValidationError(validations);
+        }
     }
 
     @Override
     @Transactional
     public Certificate add(Certificate certificate) {
-        Map<String, String> validations = validator.validateForCreate(certificate);
-        if (!validations.isEmpty()) {
-            throw new ValidationException(validations);
-        }
+        validateForCreate(certificate);
 
         List<Tag> tags = certificate.getTags() != null
-                ? ensureTagsInRepo(certificate.getTags())
+                ? ensureTagsInRepo(new ArrayList<>(certificate.getTags()))
                 : Collections.emptyList();
 
         certificate = new Certificate.Builder(certificate)
@@ -107,6 +105,13 @@ public class CertificateServiceImpl implements CertificateService {
 
         certificate = repository.add(certificate);
         return certificate;
+    }
+
+    private void validateForCreate(Certificate certificate) {
+        Map<String, String> validations = validator.validateForCreate(certificate);
+        if (!validations.isEmpty()) {
+            throw new ValidationError(validations);
+        }
     }
 
     @Override
@@ -128,33 +133,34 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public List<Certificate> findCertificatesByQueryObject(CertificateQueryObject queryObject) {
-        CertificateStream stream = null;
+        List<Specification<Certificate>> specifications = new ArrayList<>();
+
         if (nonNull(queryObject.getName())) {
-            stream = findByName(queryObject.getName());
+            specifications.add(new CertificateByNameSpecification(queryObject.getName()));
         }
-
         if (nonNull(queryObject.getDescription())) {
-            String description = queryObject.getDescription();
-            stream = stream == null ? findByDescription(description) : stream.descriptionLike(description);
+            specifications.add(new CertificateByDescriptionSpecification(queryObject.getDescription()));
         }
-
         if (nonNull(queryObject.getTagName())) {
-            String tagName = queryObject.getTagName();
-            stream = stream == null ? findByTagName(tagName) : stream.tagNameLike(tagName);
+            specifications.add(new CertificateByTagNameSpecification(queryObject.getTagName()));
         }
 
-        stream = stream == null ? findAll() : stream;
+        Stream<Certificate> certificates = repository.query(specifications).stream();
 
         if (nonNull(queryObject.getSortDate())) {
             boolean asc = queryObject.getSortDate().trim().toLowerCase(Locale.ROOT).contains(ASC_SORT);
-            stream.sortCreateDate(asc);
+            certificates = asc
+                    ? certificates.sorted(Comparator.comparing(Certificate::getCreateDate))
+                    : certificates.sorted((first, second) -> second.getCreateDate().compareTo(first.getCreateDate()));
         }
 
         if (nonNull(queryObject.getSortName())) {
             boolean asc = queryObject.getSortName().trim().toLowerCase(Locale.ROOT).contains(ASC_SORT);
-            stream.sortName(asc);
+            certificates = asc
+                    ? certificates.sorted(Comparator.comparing(Certificate::getName))
+                    : certificates.sorted((first, second) -> second.getName().compareTo(first.getName()));
         }
 
-        return stream.get();
+        return certificates.collect(Collectors.toList());
     }
 }

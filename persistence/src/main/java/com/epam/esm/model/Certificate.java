@@ -1,5 +1,7 @@
 package com.epam.esm.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.LocalDate;
 import java.util.*;
 
@@ -51,7 +53,7 @@ public class Certificate extends Entity {
     }
 
     public List<Tag> getTags() {
-        return new ArrayList<>(tags);
+        return tags;
     }
 
     @Override
@@ -87,7 +89,7 @@ public class Certificate extends Entity {
     }
 
     public static class Builder {
-        private int id;
+        private long id;
         private String name;
         private String description;
         private int price;
@@ -115,10 +117,10 @@ public class Certificate extends Entity {
 
         public static Certificate merge(Certificate to, Certificate from) {
             Builder builder = new Builder(to);
-            if (nonNull(from.name) && !from.name.trim().isEmpty()) {
+            if (nonNull(from.name) && !StringUtils.isBlank(from.name)) {
                 builder.setName(from.name);
             }
-            if (nonNull(from.description) && !from.description.trim().isEmpty()) {
+            if (nonNull(from.description) && !StringUtils.isBlank(from.description)) {
                 builder.setDescription(from.description);
             }
             if (from.duration != 0) {
@@ -132,7 +134,7 @@ public class Certificate extends Entity {
             return builder.build();
         }
 
-        public Builder setId(int id) {
+        public Builder setId(long id) {
             this.id = id;
             return this;
         }

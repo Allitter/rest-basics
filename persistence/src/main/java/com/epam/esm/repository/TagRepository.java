@@ -2,7 +2,7 @@ package com.epam.esm.repository;
 
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.model.Tag;
-import com.epam.esm.repository.specification.TagByIdSpecification;
+import com.epam.esm.repository.specification.impl.TagByIdSpecification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -31,7 +31,7 @@ public class TagRepository extends AbstractRepository<Tag> {
 
     @Override
     public Tag update(Tag tag) {
-        int id = tag.getId();
+        long id = tag.getId();
         String name = tag.getName();
         jdbcTemplate.update(UPDATE_QUERY, name, id);
         return queryFirst(new TagByIdSpecification(id)).orElseThrow(EntityNotFoundException::new);

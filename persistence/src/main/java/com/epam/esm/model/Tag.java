@@ -5,7 +5,7 @@ import java.util.*;
 public class Tag extends Entity {
     private String name;
 
-    public Tag(int id, String name) {
+    public Tag(long id, String name) {
         super(id);
         this.name = name;
     }

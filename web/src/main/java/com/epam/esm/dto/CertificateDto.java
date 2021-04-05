@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 public class CertificateDto {
-    private int id;
+    private long id;
     private String name;
     private String description;
     private int price;
@@ -18,7 +18,7 @@ public class CertificateDto {
     public CertificateDto() {
     }
 
-    public CertificateDto(int id, String name, String description, int price, int duration,
+    public CertificateDto(long id, String name, String description, int price, int duration,
                           LocalDate createDate, LocalDate lastUpdateDate, List<TagDto> tags) {
         this.id = id;
         this.name = name;
@@ -30,11 +30,11 @@ public class CertificateDto {
         this.tags = tags;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -16,11 +16,16 @@ public interface Specification<T extends Entity> {
     String query();
 
     /**
+     * Get Condition.
+     *
+     * @return condition from where clause or empty string if there is no condition
+     */
+    String getCondition();
+
+    /**
      * Get args.
      *
      * @return the array of specification parameters to prepare statement
      */
-    default Object[] getArgs() {
-        return new Object[0];
-    }
+    Object[] getArgs();
 }

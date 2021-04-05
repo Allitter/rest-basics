@@ -8,10 +8,10 @@ import com.epam.esm.model.Tag;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class DtoConverter {
+public final class EntityConverter {
 
     public static CertificateDto certificateToDto(Certificate certificate) {
-        List<TagDto> tagDtos = certificate.getTags().stream().map(DtoConverter::tagToDto).collect(Collectors.toList());
+        List<TagDto> tagDtos = certificate.getTags().stream().map(EntityConverter::tagToDto).collect(Collectors.toList());
 
         return new CertificateDto(
                 certificate.getId(),
@@ -25,7 +25,7 @@ public final class DtoConverter {
     }
 
     public static Certificate dtoToCertificate(CertificateDto dto) {
-        List<Tag> tags = dto.getTags().stream().map(DtoConverter::dtoToTag).collect(Collectors.toList());
+        List<Tag> tags = dto.getTags().stream().map(EntityConverter::dtoToTag).collect(Collectors.toList());
 
         return new Certificate.Builder()
                 .setId(dto.getId())
@@ -47,6 +47,6 @@ public final class DtoConverter {
         return new TagDto(tag.getId(), tag.getName());
     }
 
-    private DtoConverter(){
+    private EntityConverter(){
     }
 }

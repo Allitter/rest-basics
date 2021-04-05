@@ -28,7 +28,7 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
     protected int insert(String query, Object...params) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        PreparedStatementCreator psc = connection -> {
+        PreparedStatementCreator statementCreator = connection -> {
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             for (int i = 1; i <= params.length; i++) {
                 ps.setObject(i, params[i - 1]);
@@ -36,7 +36,7 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
             return ps;
         };
 
-        jdbcTemplate.update(psc, keyHolder);
+        jdbcTemplate.update(statementCreator, keyHolder);
 
         return (int) keyHolder.getKeys().get(ID_ATTRIBUTE);
     }

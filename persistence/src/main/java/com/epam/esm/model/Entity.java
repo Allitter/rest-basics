@@ -1,13 +1,13 @@
 package com.epam.esm.model;
 
 public class Entity {
-    private final int id;
+    private final long id;
 
-    public Entity(int id) {
+    public Entity(long id) {
         this.id = id;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 }

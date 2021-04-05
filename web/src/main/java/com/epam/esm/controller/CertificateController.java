@@ -1,6 +1,6 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.converter.DtoConverter;
+import com.epam.esm.converter.EntityConverter;
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.service.CertificateQueryObject;
 import com.epam.esm.model.Certificate;
@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The controller to provide CRUD operations on {@link Certificate}.
@@ -30,8 +31,9 @@ public class CertificateController {
      * @return the list of queried certificates or all certificates if no params passed
      */
     @GetMapping()
-    public List<Certificate> findByQuery(CertificateQueryObject query) {
-        return certificateService.findCertificatesByQueryObject(query);
+    public List<CertificateDto> findByQuery(CertificateQueryObject query) {
+        List<Certificate> certificates = certificateService.findCertificatesByQueryObject(query);
+        return certificates.stream().map(EntityConverter::certificateToDto).collect(Collectors.toList());
     }
 
     /**
@@ -41,8 +43,9 @@ public class CertificateController {
      * @return the {@link CertificateDto} of queried certificate
      */
     @GetMapping(value = "/{id}")
-    public Certificate findById(@PathVariable int id) {
-        return certificateService.findById(id);
+    public CertificateDto findById(@PathVariable int id) {
+        Certificate certificate = certificateService.findById(id);
+        return EntityConverter.certificateToDto(certificate);
     }
 
     /**
@@ -52,9 +55,10 @@ public class CertificateController {
      * @return the {@link CertificateDto} of added certificate
      */
     @PostMapping()
-    public Certificate add(@RequestBody CertificateDto dto) {
-        Certificate certificate = DtoConverter.dtoToCertificate(dto);
-        return certificateService.add(certificate);
+    public CertificateDto add(@RequestBody CertificateDto dto) {
+        Certificate certificate = EntityConverter.dtoToCertificate(dto);
+        Certificate result = certificateService.add(certificate);
+        return EntityConverter.certificateToDto(result);
     }
 
     /**
@@ -65,10 +69,11 @@ public class CertificateController {
      * @return the updated certificate {@link CertificateDto}
      */
     @PutMapping(value = "/{id}")
-    public Certificate update(@PathVariable int id, @RequestBody CertificateDto dto) {
+    public CertificateDto update(@PathVariable int id, @RequestBody CertificateDto dto) {
         dto.setId(id);
-        Certificate certificate = DtoConverter.dtoToCertificate(dto);
-        return certificateService.update(certificate);
+        Certificate certificate = EntityConverter.dtoToCertificate(dto);
+        Certificate updated = certificateService.update(certificate);
+        return EntityConverter.certificateToDto(updated);
     }
 
     /**

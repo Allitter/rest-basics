@@ -4,9 +4,9 @@ import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.MainRepository;
-import com.epam.esm.repository.specification.TagAllSpecification;
-import com.epam.esm.repository.specification.TagByIdSpecification;
-import com.epam.esm.repository.specification.TagByNameSpecification;
+import com.epam.esm.repository.specification.impl.TagAllSpecification;
+import com.epam.esm.repository.specification.impl.TagByIdSpecification;
+import com.epam.esm.repository.specification.impl.TagByNameSpecification;
 import com.epam.esm.validator.TagValidator;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class TagServiceImplTest {
 

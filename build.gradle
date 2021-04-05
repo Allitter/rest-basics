@@ -28,13 +28,8 @@ subprojects {
         // json
         implementation 'com.google.code.gson:gson:2.7'
 
-        // test
-        testImplementation 'org.mockito:mockito-core:2.1.0'
-        testImplementation 'org.springframework:spring-test:5.3.5'
-        testImplementation 'org.glassfish:javax.servlet:3.1'
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.0'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+        // apache commons
+        implementation 'org.apache.commons:commons-lang3:3.0'
 
         // db
         implementation 'org.springframework:spring-jdbc:5.3.5'
@@ -42,8 +37,17 @@ subprojects {
         implementation 'com.h2database:h2:1.4.200'
         implementation 'org.postgresql:postgresql:42.2.19'
 
+        // logger
         implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
         implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+
+        // test
+        testImplementation 'org.mockito:mockito-core:2.1.0'
+        testImplementation 'org.springframework:spring-test:5.3.5'
+        testImplementation 'org.glassfish:javax.servlet:3.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.0'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     }
 
     test {

@@ -3,9 +3,9 @@ package com.epam.esm.repository;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
-import com.epam.esm.repository.specification.CertificateByIdSpecification;
+import com.epam.esm.repository.specification.impl.CertificateByIdSpecification;
 import com.epam.esm.repository.specification.Specification;
-import com.epam.esm.repository.specification.TagByCertificateIdSpecification;
+import com.epam.esm.repository.specification.impl.TagByCertificateIdSpecification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -43,7 +43,7 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
     @Override
     public Certificate update(Certificate certificate) {
         List<Object> fields = extractNonIdFields(certificate);
-        int certificateId = certificate.getId();
+        long certificateId = certificate.getId();
         fields.add(certificateId);
         jdbcTemplate.update(UPDATE_QUERY, fields.toArray());
 
@@ -82,7 +82,7 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
         return taggedCertificates;
     }
 
-    private List<Tag> getCertificateTags(int id) {
+    private List<Tag> getCertificateTags(long id) {
         Specification<Tag> tagSpecification = new TagByCertificateIdSpecification(id);
         return jdbcTemplate.query(tagSpecification.query(), tagRowMapper, tagSpecification.getArgs());
     }

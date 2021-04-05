@@ -4,9 +4,7 @@ import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.MainRepository;
-import com.epam.esm.repository.specification.*;
-import com.epam.esm.service.stream.CertificateStream;
-import com.epam.esm.service.stream.impl.CertificateStreamImpl;
+import com.epam.esm.repository.specification.impl.*;
 import com.epam.esm.validator.CertificateValidator;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
@@ -17,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,11 +65,10 @@ class CertificateServiceImplTest {
         CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.query(Mockito.isA(CertificateAllSpecification.class))).thenReturn(certificates);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
-        CertificateStream expected = new CertificateStreamImpl(certificates);
 
-        CertificateStream actual = service.findAll();
+        List<Certificate> actual = service.findAll();
 
-        assertEquals(expected.get(), actual.get());
+        assertEquals(certificates, actual);
     }
 
     @Test
@@ -83,11 +79,10 @@ class CertificateServiceImplTest {
         CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.query(Mockito.isA(CertificateByTagNameSpecification.class))).thenReturn(certificates);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
-        CertificateStream expected = new CertificateStreamImpl(certificates);
 
-        CertificateStream actual = service.findByTagName(ANY_TEXT);
+        List<Certificate> actual = service.findByTagName(ANY_TEXT);
 
-        assertEquals(expected.get(), actual.get());
+        assertEquals(certificates, actual);
     }
 
     @Test
@@ -98,11 +93,10 @@ class CertificateServiceImplTest {
         CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.query(Mockito.isA(CertificateByNameSpecification.class))).thenReturn(certificates);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
-        CertificateStream expected = new CertificateStreamImpl(certificates);
 
-        CertificateStream actual = service.findByName(ANY_TEXT);
+        List<Certificate> actual = service.findByName(ANY_TEXT);
 
-        assertEquals(expected.get(), actual.get());
+        assertEquals(certificates, actual);
     }
 
     @Test
@@ -113,11 +107,10 @@ class CertificateServiceImplTest {
         CertificateValidator validator = Mockito.mock(CertificateValidator.class);
         Mockito.when(repository.query(Mockito.isA(CertificateByDescriptionSpecification.class))).thenReturn(certificates);
         CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
-        CertificateStream expected = new CertificateStreamImpl(certificates);
 
-        CertificateStream actual = service.findByDescription(ANY_TEXT);
+        List<Certificate> actual = service.findByDescription(ANY_TEXT);
 
-        assertEquals(expected.get(), actual.get());
+        assertEquals(certificates, actual);
     }
 
     @Test

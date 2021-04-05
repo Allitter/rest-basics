@@ -2,12 +2,12 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
-import com.epam.esm.exception.ValidationException;
+import com.epam.esm.exception.ValidationError;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.MainRepository;
-import com.epam.esm.repository.specification.TagAllSpecification;
-import com.epam.esm.repository.specification.TagByIdSpecification;
-import com.epam.esm.repository.specification.TagByNameSpecification;
+import com.epam.esm.repository.specification.impl.TagAllSpecification;
+import com.epam.esm.repository.specification.impl.TagByIdSpecification;
+import com.epam.esm.repository.specification.impl.TagByNameSpecification;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.TagValidator;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ public class TagServiceImpl implements TagService {
     public Tag add(Tag tag) {
         Map<String, String> validations = tagValidator.validate(tag);
         if (!validations.isEmpty()) {
-            throw new ValidationException(validations);
+            throw new ValidationError(validations);
         }
 
         if (repository.exists(new TagByNameSpecification(tag.getName()))) {

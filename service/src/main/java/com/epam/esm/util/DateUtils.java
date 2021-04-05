@@ -1,9 +1,16 @@
 package com.epam.esm.util;
 
+import java.time.YearMonth;
+
 /**
  * The type Date utils.
  */
 public final class DateUtils {
+
+    private static final int MIN_MONTH_NUMBER = 1;
+    private static final int MAX_MONTH_NUMBER = 12;
+    private static final int MIN_DAY_NUMBER = 0;
+    private static final int FIRST_MONTH = 1;
 
     /**
      * Is valid date.
@@ -14,7 +21,8 @@ public final class DateUtils {
      * @return true if date valid
      */
     public static boolean isValidDate(int year, int month, int day) {
-        return day > 0 && day <= daysInMonth(year, month) && month > 0 && month < 13;
+        return day > MIN_DAY_NUMBER && day <= daysInMonth(year, month)
+                && month >= MIN_MONTH_NUMBER && month <= MAX_MONTH_NUMBER;
     }
 
     /**
@@ -25,28 +33,8 @@ public final class DateUtils {
      * @return the number of days
      */
     public static int daysInMonth(int year, int month) {
-        int daysInMonth;
-        switch (month) {
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 8:
-            case 10:
-            case 12:
-                daysInMonth = 31;
-                break;
-            case 2:
-                if (isLeap(year)) {
-                    daysInMonth = 29;
-                } else {
-                    daysInMonth = 28;
-                }
-                break;
-            default:
-                daysInMonth = 30;
-        }
-        return daysInMonth;
+        YearMonth yearMonth = YearMonth.of(year, month);
+        return yearMonth.lengthOfMonth();
     }
 
     /**
@@ -56,7 +44,8 @@ public final class DateUtils {
      * @return true if it is leap year
      */
     public static boolean isLeap(int year) {
-        return (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0));
+        YearMonth yearMonth = YearMonth.of(year, FIRST_MONTH);
+        return yearMonth.isLeapYear();
     }
 
     private DateUtils() {

@@ -1,7 +1,6 @@
 package com.epam.esm.service;
 
 import com.epam.esm.model.Certificate;
-import com.epam.esm.service.stream.CertificateStream;
 
 import java.util.List;
 
@@ -21,9 +20,9 @@ public interface CertificateService {
     /**
      * Finds all certificates
      *
-     * @return all certificate in {@link CertificateStream}
+     * @return all certificates
      */
-    CertificateStream findAll();
+    List<Certificate> findAll();
 
     /**
      * Finds certificate by tag name
@@ -31,7 +30,7 @@ public interface CertificateService {
      * @param tagName the name of tag to search
      * @return certificates that contain tags with part of queried name
      */
-    CertificateStream findByTagName(String tagName);
+    List<Certificate> findByTagName(String tagName);
 
     /**
      * Find by name certificate stream.
@@ -39,7 +38,7 @@ public interface CertificateService {
      * @param name part of name to search
      * @return certificates that contain asked part of name
      */
-    CertificateStream findByName(String name);
+    List<Certificate> findByName(String name);
 
     /**
      * Find by description certificate stream.
@@ -47,7 +46,7 @@ public interface CertificateService {
      * @param description part of description to search
      * @return certificates that contain asked part of description
      */
-    CertificateStream findByDescription(String description);
+    List<Certificate> findByDescription(String description);
 
     /**
      * Update certificate dto.

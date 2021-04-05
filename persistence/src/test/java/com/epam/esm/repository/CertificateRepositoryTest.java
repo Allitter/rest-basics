@@ -4,6 +4,7 @@ import com.epam.esm.config.TestConfig;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.specification.*;
+import com.epam.esm.repository.specification.impl.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

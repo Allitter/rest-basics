@@ -5,6 +5,7 @@ import com.epam.esm.model.Tag;
 import com.epam.esm.util.ResourceBundleMessage;
 import com.epam.esm.validator.CertificateValidator;
 import com.epam.esm.validator.TagValidator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -17,6 +18,13 @@ public class CertificateValidatorImpl implements CertificateValidator {
     private static final String PRICE_ATTRIBUTE = "price";
     private static final String DESCRIPTION_ATTRIBUTE = "description";
     private static final String NAME_ATTRIBUTE = "certificate_name";
+    private static final int MIN_NAME_LENGTH = 2;
+    private static final int MAX_NAME_LENGTH = 64;
+    private static final int MIN_DURATION = 1;
+    private static final int MIN_PRICE = 0;
+    private static final int ZERO = 0;
+    private static final int MIN_DESCRIPTION_LENGTH = 2;
+    private static final int MAX_DESCRIPTION_LENGTH = 255;
     private final TagValidator tagValidator;
 
     public CertificateValidatorImpl(TagValidator tagValidator) {
@@ -38,13 +46,13 @@ public class CertificateValidatorImpl implements CertificateValidator {
     @Override
     public Map<String, String> validateForUpdate(Certificate certificate) {
         Map<String, String> result = new HashMap<>();
-        if (!isEmpty(certificate.getName())) {
+        if (!StringUtils.isBlank(certificate.getName())) {
             result.putAll(validateName(certificate.getName()));
         }
-        if (!isEmpty(certificate.getDescription())) {
+        if (!StringUtils.isBlank(certificate.getDescription())) {
             result.putAll(validateDescription(certificate.getDescription()));
         }
-        if (certificate.getDuration() != 0) {
+        if (certificate.getDuration() != ZERO) {
             result.putAll(validateDuration(certificate.getDuration()));
         }
         if (certificate.getTags() != null && !certificate.getTags().isEmpty()) {
@@ -58,12 +66,12 @@ public class CertificateValidatorImpl implements CertificateValidator {
     public Map<String, String> validateName(String name) {
         Map<String, String> result = new HashMap<>();
 
-        if (isEmpty(name)) {
+        if (StringUtils.isBlank(name)) {
             result.put(NAME_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_NAME_EMPTY);
             return result;
         }
         name = name.trim();
-        if (name.length() < 2 || name.length() > 64) {
+        if (name.length() < MIN_NAME_LENGTH || name.length() > MAX_NAME_LENGTH) {
             result.put(NAME_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_NAME_FORMAT);
         }
 
@@ -73,12 +81,12 @@ public class CertificateValidatorImpl implements CertificateValidator {
     public Map<String, String> validateDescription(String description) {
         Map<String, String> result = new HashMap<>();
 
-        if (isEmpty(description)) {
+        if (StringUtils.isBlank(description)) {
             result.put(DESCRIPTION_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_DESCRIPTION_EMPTY);
             return result;
         }
         description = description.trim();
-        if (description.length() < 2 || description.length() > 255) {
+        if (description.length() < MIN_DESCRIPTION_LENGTH || description.length() > MAX_DESCRIPTION_LENGTH) {
             result.put(DESCRIPTION_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_DESCRIPTION_FORMAT);
         }
 
@@ -87,7 +95,7 @@ public class CertificateValidatorImpl implements CertificateValidator {
 
     public Map<String, String> validatePrice(int price) {
         Map<String, String> result = new HashMap<>();
-        if (price < 0) {
+        if (price < MIN_PRICE) {
             result.put(PRICE_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_PRICE_FORMAT);
         }
 
@@ -96,7 +104,7 @@ public class CertificateValidatorImpl implements CertificateValidator {
 
     public Map<String, String> validateDuration(int duration) {
         Map<String, String> result = new HashMap<>();
-        if (duration < 1) {
+        if (duration < MIN_DURATION) {
             result.put(DURATION_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_DURATION_FORMAT);
         }
 
@@ -114,9 +122,5 @@ public class CertificateValidatorImpl implements CertificateValidator {
         }
 
         return result;
-    }
-
-    private boolean isEmpty(String str) {
-        return str == null || str.trim().isEmpty();
     }
 }
