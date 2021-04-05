@@ -52,4 +52,6 @@ public interface MainRepository<T extends Entity> {
      * @return first of entities matching the specification or empty optional
      */
     Optional<T> queryFirst(Specification<T> specification);
+
+    boolean exists(Specification<?> specification);
 }

@@ -4,12 +4,10 @@ plugins {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-web:5.3.5'
-    implementation 'org.springframework:spring-webmvc:5.3.5'
-
-    implementation 'com.google.code.gson:gson:2.7'
-
-    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'org.springframework:spring-web'
+    implementation 'org.springframework:spring-webmvc'
+    implementation 'com.google.code.gson:gson'
+    compileOnly 'javax.servlet:javax.servlet-api'
 
     implementation project(":persistence")
     implementation project(":service")

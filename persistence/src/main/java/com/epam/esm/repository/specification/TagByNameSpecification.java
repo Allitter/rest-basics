@@ -11,7 +11,7 @@ public class TagByNameSpecification implements Specification<Tag> {
 
     @Override
     public String query() {
-        return "select * from tag where name = ?;";
+        return "select * from tag where name = ?";
     }
 
     @Override

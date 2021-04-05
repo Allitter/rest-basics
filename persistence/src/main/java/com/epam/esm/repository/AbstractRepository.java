@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractRepository<T extends Entity> implements MainRepository<T> {
-    private static final String DELETE_BY_ID_QUERY = "DELETE FROM %s WHERE id = ?;";
+    private static final String DELETE_BY_ID_QUERY = "DELETE FROM %s WHERE id = ?";
+    private static final String ID_ATTRIBUTE = "id";
+    private static final String EXISTS_QUERY = "SELECT EXISTS(%s) as ex";
     protected final JdbcTemplate jdbcTemplate;
     protected final RowMapper<T> mapper;
 
@@ -31,13 +33,12 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
             for (int i = 1; i <= params.length; i++) {
                 ps.setObject(i, params[i - 1]);
             }
-
             return ps;
         };
 
         jdbcTemplate.update(psc, keyHolder);
 
-        return (int) keyHolder.getKeys().get("id");
+        return (int) keyHolder.getKeys().get(ID_ATTRIBUTE);
     }
 
     @Override
@@ -59,4 +60,9 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
         return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
     }
 
+    @Override
+    public boolean exists(Specification<?> specification) {
+        String existsQuery = String.format(EXISTS_QUERY, specification.query());
+        return jdbcTemplate.queryForObject(existsQuery, Boolean.class, specification.getArgs());
+    }
 }

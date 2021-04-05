@@ -11,7 +11,7 @@ public class TagByIdSpecification implements Specification<Tag> {
 
     @Override
     public String query() {
-        return "select * from tag where id = ?;";
+        return "select * from tag where id = ?";
     }
 
     @Override

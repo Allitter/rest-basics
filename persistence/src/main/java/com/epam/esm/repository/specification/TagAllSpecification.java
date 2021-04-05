@@ -6,6 +6,6 @@ public class TagAllSpecification implements Specification<Tag> {
 
     @Override
     public String query() {
-        return "SELECT * FROM tag;";
+        return "SELECT * FROM tag";
     }
 }

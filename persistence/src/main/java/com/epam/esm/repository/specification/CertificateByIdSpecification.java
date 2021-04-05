@@ -11,7 +11,7 @@ public class CertificateByIdSpecification implements Specification<Certificate> 
 
     @Override
     public String query() {
-        return "SELECT * FROM certificate WHERE id = ?;";
+        return "SELECT * FROM certificate WHERE id = ?";
     }
 
     @Override

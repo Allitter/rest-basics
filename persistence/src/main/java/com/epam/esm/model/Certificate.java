@@ -115,24 +115,19 @@ public class Certificate extends Entity {
 
         public static Certificate merge(Certificate to, Certificate from) {
             Builder builder = new Builder(to);
-            if (nonNull(from.name)) {
+            if (nonNull(from.name) && !from.name.trim().isEmpty()) {
                 builder.setName(from.name);
             }
-            if (nonNull(from.description)) {
+            if (nonNull(from.description) && !from.description.trim().isEmpty()) {
                 builder.setDescription(from.description);
-            }
-            if (from.price != 0) {
-                builder.setPrice(from.price);
             }
             if (from.duration != 0) {
                 builder.setDuration(from.duration);
             }
-            if (nonNull(from.createDate)) {
-                builder.setCreateDate(from.createDate);
-            }
             if (from.tags != null && !from.tags.isEmpty()) {
                 builder.setTags(from.tags);
             }
+            builder.setPrice(from.price);
 
             return builder.build();
         }

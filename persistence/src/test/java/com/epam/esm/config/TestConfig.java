@@ -30,8 +30,8 @@ public class TestConfig {
     }
 
     @Bean
-    public TagRepository tagRepository(TagMapper tagMapper) {
-        return new TagRepository(jdbcTemplate(), tagMapper);
+    public TagRepository tagRepository() {
+        return new TagRepository(jdbcTemplate(), tagMapper());
     }
 
     @Bean

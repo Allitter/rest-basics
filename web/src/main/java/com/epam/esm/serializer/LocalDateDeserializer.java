@@ -1,4 +1,4 @@
-package com.epam.esm.config.serializer;
+package com.epam.esm.serializer;
 
 import com.epam.esm.util.DateUtils;
 import com.google.gson.JsonDeserializationContext;

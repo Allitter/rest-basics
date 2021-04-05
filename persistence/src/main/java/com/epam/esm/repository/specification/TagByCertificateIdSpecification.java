@@ -11,7 +11,7 @@ public class TagByCertificateIdSpecification implements Specification<Tag> {
 
     @Override
     public String query() {
-        return "select t.id, name from tag as t join certificate_tag as ct on t.id = ct.id_tag where ct.id_certificate = ?;";
+        return "select t.id, name from tag as t join certificate_tag as ct on t.id = ct.id_tag where ct.id_certificate = ?";
     }
 
     @Override

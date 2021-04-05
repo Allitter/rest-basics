@@ -11,7 +11,7 @@ public class CertificateByNameSpecification implements Specification<Certificate
 
     @Override
     public String query() {
-        return "select * from certificate where name like ?;";
+        return "select * from certificate where name like ?";
     }
 
     @Override

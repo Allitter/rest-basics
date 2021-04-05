@@ -30,19 +30,6 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
         this.tagRowMapper = tagRowMapper;
     }
 
-    private List<Object> extractNonIdFields(Certificate certificate) {
-        List<Object> fields = Arrays.asList(
-                certificate.getName(),
-                certificate.getDescription(),
-                certificate.getPrice(),
-                certificate.getDuration(),
-                certificate.getCreateDate(),
-                certificate.getLastUpdateDate()
-        );
-
-        return new ArrayList<>(fields);
-    }
-
     @Override
     public Certificate add(Certificate certificate) {
         List<Object> fields = extractNonIdFields(certificate);
@@ -65,6 +52,19 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
         tags.forEach(tag -> jdbcTemplate.update(ADD_TAG_QUERY, certificateId, tag.getId()));
 
         return this.queryFirst(new CertificateByIdSpecification(certificateId)).orElseThrow(EntityNotFoundException::new);
+    }
+
+    private List<Object> extractNonIdFields(Certificate certificate) {
+        List<Object> fields = Arrays.asList(
+                certificate.getName(),
+                certificate.getDescription(),
+                certificate.getPrice(),
+                certificate.getDuration(),
+                certificate.getCreateDate(),
+                certificate.getLastUpdateDate()
+        );
+
+        return new ArrayList<>(fields);
     }
 
     @Override

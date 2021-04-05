@@ -3,7 +3,7 @@ package com.epam.esm.service.stream.impl;
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.service.stream.CertificateStream;
-import com.epam.esm.util.DtoUtils;
+import com.epam.esm.util.DtoConverter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -58,6 +58,6 @@ public class CertificateStreamImpl implements CertificateStream {
 
     @Override
     public List<CertificateDto> get() {
-        return certificateStream.map(DtoUtils::certificateToDto).collect(Collectors.toList());
+        return certificateStream.map(DtoConverter::certificateToDto).collect(Collectors.toList());
     }
 }

@@ -1,30 +1,31 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.model.Tag;
-
 import java.util.Objects;
 import java.util.StringJoiner;
 
 public class TagDto {
-    private final int id;
-    private final String name;
+    private int id;
+    private String name;
 
     public TagDto(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public TagDto(Tag tag) {
-        this.id = tag.getId();
-        this.name = tag.getName();
-    }
-
     public int getId() {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

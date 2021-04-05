@@ -1,11 +1,18 @@
 package com.epam.esm.util;
 
 import com.epam.esm.dto.CertificateDto;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.model.Certificate;
+import com.epam.esm.model.Tag;
 
-public final class DtoUtils {
+import java.util.List;
+import java.util.stream.Collectors;
+
+public final class DtoConverter {
 
     public static CertificateDto certificateToDto(Certificate certificate) {
+        List<TagDto> tagDtos = certificate.getTags().stream().map(DtoConverter::tagToDto).collect(Collectors.toList());
+
         return new CertificateDto(
                 certificate.getId(),
                 certificate.getName(),
@@ -14,10 +21,12 @@ public final class DtoUtils {
                 certificate.getDuration(),
                 certificate.getCreateDate(),
                 certificate.getLastUpdateDate(),
-                certificate.getTags());
+                tagDtos);
     }
 
     public static Certificate dtoToCertificate(CertificateDto dto) {
+        List<Tag> tags = dto.getTags().stream().map(DtoConverter::dtoToTag).collect(Collectors.toList());
+
         return new Certificate.Builder()
                 .setId(dto.getId())
                 .setName(dto.getName())
@@ -26,10 +35,18 @@ public final class DtoUtils {
                 .setDuration(dto.getDuration())
                 .setCreateDate(dto.getCreateDate())
                 .setLastUpdateDate(dto.getLastUpdateDate())
-                .setTags(dto.getTags())
+                .setTags(tags)
                 .build();
     }
 
-    private DtoUtils(){
+    public static Tag dtoToTag(TagDto dto) {
+        return new Tag(dto.getId(), dto.getName());
+    }
+
+    public static TagDto tagToDto(Tag tag) {
+        return new TagDto(tag.getId(), tag.getName());
+    }
+
+    private DtoConverter(){
     }
 }

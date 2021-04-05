@@ -1,7 +1,7 @@
 package com.epam.esm.config;
 
-import com.epam.esm.config.serializer.LocalDateDeserializer;
-import com.epam.esm.config.serializer.LocalDateSerializer;
+import com.epam.esm.serializer.LocalDateDeserializer;
+import com.epam.esm.serializer.LocalDateSerializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.context.MessageSource;
@@ -35,15 +35,18 @@ public class SpringConfig implements WebMvcConfigurer {
 
     @Bean
     public GsonHttpMessageConverter gsonHttpMessageConverter() {
-        Gson gson = new GsonBuilder()
+        GsonHttpMessageConverter gsonConverter = new GsonHttpMessageConverter();
+        gsonConverter.setGson(gson());
+
+        return gsonConverter;
+    }
+
+    @Bean
+    public Gson gson() {
+        return new GsonBuilder()
                 .registerTypeAdapter(LocalDate.class, new LocalDateSerializer())
                 .registerTypeAdapter(LocalDate.class, new LocalDateDeserializer())
                 .create();
-
-        GsonHttpMessageConverter gsonConverter = new GsonHttpMessageConverter();
-        gsonConverter.setGson(gson);
-
-        return gsonConverter;
     }
 
     @Override

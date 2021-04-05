@@ -11,7 +11,7 @@ public class CertificateByDescriptionSpecification implements Specification<Cert
 
     @Override
     public String query() {
-        return "select * from certificate where description like ?;";
+        return "select * from certificate where description like ?";
     }
 
     @Override

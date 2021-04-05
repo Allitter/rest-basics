@@ -6,6 +6,6 @@ public class CertificateAllSpecification implements Specification<Certificate> {
 
     @Override
     public String query() {
-        return "SELECT * FROM certificate;";
+        return "SELECT * FROM certificate";
     }
 }

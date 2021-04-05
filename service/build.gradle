@@ -1,5 +1,5 @@
 dependencies {
-    implementation 'org.springframework:spring-tx:5.3.2'
+    implementation 'org.springframework:spring-tx'
 
     implementation project(":persistence")
 }

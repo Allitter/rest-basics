@@ -11,7 +11,7 @@ public class CertificateByTagNameSpecification implements Specification<Certific
 
     @Override
     public String query() {
-        return "select c.* from certificate as c join certificate_tag as ct on c.id = ct.id_certificate join tag as t on ct.id_tag = t.id where t.name LIKE ?;";
+        return "select c.* from certificate as c join certificate_tag as ct on c.id = ct.id_certificate join tag as t on ct.id_tag = t.id where t.name LIKE ?";
     }
 
     @Override

@@ -4,7 +4,10 @@ import com.epam.esm.config.TestConfig;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.specification.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,9 +21,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Component
 @ExtendWith(SpringExtension.class)
@@ -112,7 +113,7 @@ class CertificateRepositoryTest {
     @Test
     @Order(1)
     void testAddShouldAddCertificateToDataSourceIfCertificateNotYetCreated() {
-        Certificate expected =FIFTH_CERTIFICATE;
+        Certificate expected = FIFTH_CERTIFICATE;
 
         Certificate actual = certificateRepository.add(expected);
 

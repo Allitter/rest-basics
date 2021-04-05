@@ -1,7 +1,5 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.model.Tag;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -15,13 +13,13 @@ public class CertificateDto {
     private int duration;
     private LocalDate createDate;
     private LocalDate lastUpdateDate;
-    private List<Tag> tags;
+    private List<TagDto> tags;
 
     public CertificateDto() {
     }
 
     public CertificateDto(int id, String name, String description, int price, int duration,
-                          LocalDate createDate, LocalDate lastUpdateDate, List<Tag> tags) {
+                          LocalDate createDate, LocalDate lastUpdateDate, List<TagDto> tags) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -88,11 +86,11 @@ public class CertificateDto {
         this.lastUpdateDate = lastUpdateDate;
     }
 
-    public List<Tag> getTags() {
+    public List<TagDto> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(List<TagDto> tags) {
         this.tags = tags;
     }
 
