@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ValidationError extends RuntimeException {
+public class ValidationException extends RuntimeException {
     private final Map<String, String> validationFails;
 
-    public ValidationError(Map<String, String> validationFails) {
+    public ValidationException(Map<String, String> validationFails) {
         this.validationFails = new HashMap<>(validationFails);
     }
 

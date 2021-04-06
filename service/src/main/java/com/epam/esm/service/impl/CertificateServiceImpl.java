@@ -1,7 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.exception.EntityNotFoundException;
-import com.epam.esm.exception.ValidationError;
+import com.epam.esm.exception.ValidationException;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.MainRepository;
@@ -11,6 +11,7 @@ import com.epam.esm.service.CertificateQueryObject;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.validator.CertificateValidator;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +67,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     @Transactional
     public Certificate update(Certificate certificate) {
-        validateForUpdate(certificate);
+        throwExceptionIfNotValid(validator.validateForUpdate(certificate));
 
         Optional<Certificate> optional = repository.queryFirst(new CertificateByIdSpecification(certificate.getId()));
         Certificate oldCertificate = optional.orElseThrow(EntityNotFoundException::new);
@@ -82,17 +83,10 @@ public class CertificateServiceImpl implements CertificateService {
         return repository.update(certificateToUpdate);
     }
 
-    private void validateForUpdate(Certificate certificate) {
-        Map<String, String> validations = validator.validateForUpdate(certificate);
-        if (!validations.isEmpty()) {
-            throw new ValidationError(validations);
-        }
-    }
-
     @Override
     @Transactional
     public Certificate add(Certificate certificate) {
-        validateForCreate(certificate);
+        throwExceptionIfNotValid(validator.validateForCreate(certificate));
 
         List<Tag> tags = CollectionUtils.isNotEmpty(certificate.getTags())
                 ? ensureTagsInRepo(certificate.getTags())
@@ -106,10 +100,9 @@ public class CertificateServiceImpl implements CertificateService {
         return repository.add(certificate);
     }
 
-    private void validateForCreate(Certificate certificate) {
-        Map<String, String> validations = validator.validateForCreate(certificate);
-        if (!validations.isEmpty()) {
-            throw new ValidationError(validations);
+    private void throwExceptionIfNotValid(Map<String, String> validationFails) {
+        if (MapUtils.isNotEmpty(validationFails)) {
+            throw new ValidationException(validationFails);
         }
     }
 
@@ -119,17 +112,17 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     private List<Tag> ensureTagsInRepo(List<Tag> tags) {
-        List<Tag> copy = new ArrayList<>(tags);
+        List<Tag> tagsCopy = new ArrayList<>(tags);
 
         for (int i = 0; i < tags.size(); i++) {
-            Tag tag = copy.get(i);
+            Tag tag = tagsCopy.get(i);
             Specification<Tag> specification = new TagByNameSpecification(tag.getName());
             Optional<Tag> optional = tagRepository.queryFirst(specification);
             tag = optional.isPresent() ? optional.get() : tagRepository.add(tag);
-            copy.set(i, tag);
+            tagsCopy.set(i, tag);
         }
 
-        return copy;
+        return tagsCopy;
     }
 
     @Override
@@ -158,7 +151,7 @@ public class CertificateServiceImpl implements CertificateService {
                     : certificates.sorted((first, second) -> second.getCreateDate().compareTo(first.getCreateDate()));
         }
 
-        if (nonNull(queryObject.getSortName())) {
+        if (StringUtils.isNotBlank(queryObject.getSortName())) {
             boolean isAscending = StringUtils.containsIgnoreCase(queryObject.getSortName(), ASCENDING_SORT);
             certificates = isAscending
                     ? certificates.sorted(Comparator.comparing(Certificate::getName))
