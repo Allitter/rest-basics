@@ -5,12 +5,11 @@ import com.epam.esm.exception.ValidationError;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.MainRepository;
-import com.epam.esm.repository.specification.*;
+import com.epam.esm.repository.specification.Specification;
 import com.epam.esm.repository.specification.impl.*;
 import com.epam.esm.service.CertificateQueryObject;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.validator.CertificateValidator;
-import org.apache.logging.log4j.util.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

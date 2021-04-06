@@ -3,6 +3,7 @@ package com.epam.esm.repository;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
+import com.epam.esm.repository.specification.SpecificationCompressor;
 import com.epam.esm.repository.specification.impl.CertificateByIdSpecification;
 import com.epam.esm.repository.specification.Specification;
 import com.epam.esm.repository.specification.impl.TagByCertificateIdSpecification;
@@ -25,8 +26,9 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
 
     private final RowMapper<Tag> tagRowMapper;
 
-    public CertificateRepository(JdbcTemplate jdbcTemplate, RowMapper<Certificate> mapper, RowMapper<Tag> tagRowMapper) {
-        super(jdbcTemplate, mapper);
+    public CertificateRepository(JdbcTemplate jdbcTemplate, RowMapper<Certificate> mapper, RowMapper<Tag> tagRowMapper,
+                                 SpecificationCompressor<Certificate> specificationCompressor) {
+        super(jdbcTemplate, mapper, specificationCompressor);
         this.tagRowMapper = tagRowMapper;
     }
 

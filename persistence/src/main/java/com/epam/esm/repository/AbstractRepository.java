@@ -1,7 +1,11 @@
 package com.epam.esm.repository;
 
+import com.epam.esm.exception.RepositoryError;
+import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Entity;
+import com.epam.esm.repository.specification.CertificateSpecificationCompressor;
 import com.epam.esm.repository.specification.Specification;
+import com.epam.esm.repository.specification.SpecificationCompressor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,10 +23,13 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
     private static final String EXISTS_QUERY = "SELECT EXISTS(%s) as ex";
     protected final JdbcTemplate jdbcTemplate;
     protected final RowMapper<T> mapper;
+    protected final SpecificationCompressor<T> specificationCompressor;
 
-    protected AbstractRepository(JdbcTemplate jdbcTemplate, RowMapper<T> mapper) {
+    protected AbstractRepository(JdbcTemplate jdbcTemplate, RowMapper<T> mapper,
+                                 SpecificationCompressor<T> specificationCompressor) {
         this.jdbcTemplate = jdbcTemplate;
         this.mapper = mapper;
+        this.specificationCompressor = specificationCompressor;
     }
 
     protected int insert(String query, Object...params) {
@@ -58,6 +65,16 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
     public Optional<T> queryFirst(Specification<T> specification) {
         List<T> list = query(specification);
         return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
+    }
+
+    @Override
+    public List<T> query(List<Specification<T>> specifications)  {
+        if (specifications == null || specifications.isEmpty()) {
+            throw new RepositoryError();
+        }
+
+        Specification<T> specification = specificationCompressor.buildFrom(specifications);
+        return query(specification);
     }
 
     @Override
