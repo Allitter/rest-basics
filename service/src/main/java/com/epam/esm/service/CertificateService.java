@@ -15,7 +15,7 @@ public interface CertificateService {
      * @param id the id
      * @return {@link Certificate}
      */
-    Certificate findById(int id);
+    Certificate findById(long id);
 
     /**
      * Finds all certificates
@@ -70,7 +70,7 @@ public interface CertificateService {
      * @param id of certificate to remove
      * @return true if removed, false otherwise
      */
-    boolean remove(int id);
+    boolean remove(long id);
 
     /**
      * Find certificates by query object list.

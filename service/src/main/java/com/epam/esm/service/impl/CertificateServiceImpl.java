@@ -10,6 +10,8 @@ import com.epam.esm.repository.specification.impl.*;
 import com.epam.esm.service.CertificateQueryObject;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.validator.CertificateValidator;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +24,7 @@ import static java.util.Objects.nonNull;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
-    private static final String ASC_SORT = "asc";
+    private static final String ASCENDING_SORT = "asc";
     private final MainRepository<Tag> tagRepository;
     private final MainRepository<Certificate> repository;
     private final CertificateValidator validator;
@@ -36,7 +38,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public Certificate findById(int id) {
+    public Certificate findById(long id) {
         Optional<Certificate> optionalCertificate = repository.queryFirst(new CertificateByIdSpecification(id));
         return optionalCertificate.orElseThrow(EntityNotFoundException::new);
     }
@@ -70,8 +72,7 @@ public class CertificateServiceImpl implements CertificateService {
         Certificate oldCertificate = optional.orElseThrow(EntityNotFoundException::new);
 
         Certificate certificateToUpdate = Certificate.Builder.merge(oldCertificate, certificate);
-        List<Tag> tags = new ArrayList<>(certificateToUpdate.getTags());
-        List<Tag> ensuredTags = ensureTagsInRepo(tags);
+        List<Tag> ensuredTags = ensureTagsInRepo(certificateToUpdate.getTags());
 
         certificateToUpdate = new Certificate.Builder(certificateToUpdate)
                 .setLastUpdateDate(LocalDate.now())
@@ -93,8 +94,8 @@ public class CertificateServiceImpl implements CertificateService {
     public Certificate add(Certificate certificate) {
         validateForCreate(certificate);
 
-        List<Tag> tags = certificate.getTags() != null
-                ? ensureTagsInRepo(new ArrayList<>(certificate.getTags()))
+        List<Tag> tags = CollectionUtils.isNotEmpty(certificate.getTags())
+                ? ensureTagsInRepo(certificate.getTags())
                 : Collections.emptyList();
 
         certificate = new Certificate.Builder(certificate)
@@ -102,8 +103,7 @@ public class CertificateServiceImpl implements CertificateService {
                 .setLastUpdateDate(LocalDate.now())
                 .setTags(tags).build();
 
-        certificate = repository.add(certificate);
-        return certificate;
+        return repository.add(certificate);
     }
 
     private void validateForCreate(Certificate certificate) {
@@ -114,48 +114,53 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public boolean remove(int id) {
+    public boolean remove(long id) {
         return repository.remove(id);
     }
 
     private List<Tag> ensureTagsInRepo(List<Tag> tags) {
+        List<Tag> copy = new ArrayList<>(tags);
+
         for (int i = 0; i < tags.size(); i++) {
-            Tag tag = tags.get(i);
+            Tag tag = copy.get(i);
             Specification<Tag> specification = new TagByNameSpecification(tag.getName());
             Optional<Tag> optional = tagRepository.queryFirst(specification);
             tag = optional.isPresent() ? optional.get() : tagRepository.add(tag);
-            tags.set(i, tag);
+            copy.set(i, tag);
         }
 
-        return tags;
+        return copy;
     }
 
     @Override
     public List<Certificate> findCertificatesByQueryObject(CertificateQueryObject queryObject) {
         List<Specification<Certificate>> specifications = new ArrayList<>();
 
-        if (nonNull(queryObject.getName())) {
+        if (StringUtils.isNotBlank(queryObject.getName())) {
             specifications.add(new CertificateByNameSpecification(queryObject.getName()));
         }
-        if (nonNull(queryObject.getDescription())) {
+        if (StringUtils.isNotBlank(queryObject.getDescription())) {
             specifications.add(new CertificateByDescriptionSpecification(queryObject.getDescription()));
         }
-        if (nonNull(queryObject.getTagName())) {
+        if (StringUtils.isNotBlank(queryObject.getTagName())) {
             specifications.add(new CertificateByTagNameSpecification(queryObject.getTagName()));
+        }
+        if (specifications.isEmpty()) {
+            specifications.add(new CertificateAllSpecification());
         }
 
         Stream<Certificate> certificates = repository.query(specifications).stream();
 
         if (nonNull(queryObject.getSortDate())) {
-            boolean asc = queryObject.getSortDate().trim().toLowerCase(Locale.ROOT).contains(ASC_SORT);
-            certificates = asc
+            boolean isAscending = StringUtils.containsIgnoreCase(queryObject.getSortDate(), ASCENDING_SORT);
+            certificates = isAscending
                     ? certificates.sorted(Comparator.comparing(Certificate::getCreateDate))
                     : certificates.sorted((first, second) -> second.getCreateDate().compareTo(first.getCreateDate()));
         }
 
         if (nonNull(queryObject.getSortName())) {
-            boolean asc = queryObject.getSortName().trim().toLowerCase(Locale.ROOT).contains(ASC_SORT);
-            certificates = asc
+            boolean isAscending = StringUtils.containsIgnoreCase(queryObject.getSortName(), ASCENDING_SORT);
+            certificates = isAscending
                     ? certificates.sorted(Comparator.comparing(Certificate::getName))
                     : certificates.sorted((first, second) -> second.getName().compareTo(first.getName()));
         }

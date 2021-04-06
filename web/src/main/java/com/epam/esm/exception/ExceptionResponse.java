@@ -21,8 +21,12 @@ public class ExceptionResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ExceptionResponse that = (ExceptionResponse) o;
         return code == that.code && Objects.equals(messages, that.messages);
     }

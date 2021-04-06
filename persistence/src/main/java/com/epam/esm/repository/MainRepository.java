@@ -35,7 +35,7 @@ public interface MainRepository<T extends Entity> {
      * @param id the id of entity to be removed
      * @return true if removed, false otherwise
      */
-    boolean remove(int id);
+    boolean remove(long id);
 
     /**
      * Query.

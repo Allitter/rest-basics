@@ -36,7 +36,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(ValidationError.class)
     public ResponseEntity<ExceptionResponse> handleValidationException(ValidationError e, Locale locale) {
-        List<String> messages = e.getValidations()
+        List<String> messages = e.getValidationFails()
                 .values().stream()
                 .map(validation -> messageSource.getMessage(validation, new Object[]{}, locale))
                 .collect(Collectors.toList());

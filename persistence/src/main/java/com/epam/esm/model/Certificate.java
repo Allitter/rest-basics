@@ -1,12 +1,13 @@
 package com.epam.esm.model;
 
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
 import java.util.*;
 
 import static java.util.Objects.hash;
-import static java.util.Objects.nonNull;
 
 public class Certificate extends Entity {
     private final String name;
@@ -57,25 +58,6 @@ public class Certificate extends Entity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Certificate that = (Certificate) o;
-        return price == that.price
-                && duration == that.duration
-                && Objects.equals(name, that.name)
-                && Objects.equals(description, that.description)
-                && Objects.equals(createDate, that.createDate)
-                && Objects.equals(lastUpdateDate, that.lastUpdateDate)
-                && Objects.equals(tags, that.tags);
-    }
-
-    @Override
-    public int hashCode() {
-        return hash(name, description, price, duration, createDate, lastUpdateDate, tags);
-    }
-
-    @Override
     public String toString() {
         return new StringJoiner(", ", Certificate.class.getSimpleName() + "[", "]")
                 .add("name='" + name + "'")
@@ -88,7 +70,34 @@ public class Certificate extends Entity {
                 .toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        Certificate that = (Certificate) o;
+        return price == that.price
+                && duration == that.duration
+                && Objects.equals(name, that.name)
+                && Objects.equals(description, that.description)
+                && Objects.equals(createDate, that.createDate)
+                && Objects.equals(lastUpdateDate, that.lastUpdateDate)
+                && Objects.equals(tags, that.tags);
+    }
+
+    @Override
+    public int hashCode() {
+        return hash(super.hashCode(), name, description, price, duration, createDate, lastUpdateDate, tags);
+    }
+
     public static class Builder {
+        private static final int ZERO = 0;
         private long id;
         private String name;
         private String description;
@@ -117,16 +126,16 @@ public class Certificate extends Entity {
 
         public static Certificate merge(Certificate to, Certificate from) {
             Builder builder = new Builder(to);
-            if (nonNull(from.name) && !StringUtils.isBlank(from.name)) {
+            if (StringUtils.isNotBlank(from.name)) {
                 builder.setName(from.name);
             }
-            if (nonNull(from.description) && !StringUtils.isBlank(from.description)) {
+            if (StringUtils.isNotBlank(from.description)) {
                 builder.setDescription(from.description);
             }
-            if (from.duration != 0) {
+            if (from.duration != ZERO) {
                 builder.setDuration(from.duration);
             }
-            if (from.tags != null && !from.tags.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(from.tags)) {
                 builder.setTags(from.tags);
             }
             builder.setPrice(from.price);

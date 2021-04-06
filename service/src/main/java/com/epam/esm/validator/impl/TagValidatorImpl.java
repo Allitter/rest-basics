@@ -3,6 +3,7 @@ package com.epam.esm.validator.impl;
 import com.epam.esm.model.Tag;
 import com.epam.esm.util.ResourceBundleMessage;
 import com.epam.esm.validator.TagValidator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class TagValidatorImpl implements TagValidator {
         Map<String, String> result = new HashMap<>();
 
         String name = tag.getName();
-        if (name == null) {
+        if (StringUtils.isBlank(name)) {
             result.put(NAME_ATTRIBUTE, ResourceBundleMessage.TAG_NAME_EMPTY);
             return result;
         }

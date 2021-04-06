@@ -18,18 +18,24 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TagServiceImplTest {
+    private static final long FIRST_TAG_ID = 1;
+    private static final String FIRST_TAG_NAME = "first";
+    private static final Tag FIRST_TAG = new Tag(FIRST_TAG_ID, FIRST_TAG_NAME);
+    private static final long SECOND_TAG_ID = 2;
+    private static final String SECOND_TAG_NAME = "second";
+    private static final Tag SECOND_TAG = new Tag(SECOND_TAG_ID, SECOND_TAG_NAME);
+    private static final long NON_EXISTING_ID = -1;
 
     @Test
     void testFindByIdShouldReturnTagDtoWithPassedId() {
-        Tag expected = new Tag(1, "name");
         MainRepository<Tag> repository = Mockito.mock(MainRepository.class);
         TagValidator validator = Mockito.mock(TagValidator.class);
-        Mockito.when(repository.queryFirst(Mockito.isA(TagByIdSpecification.class))).thenReturn(Optional.of(expected));
+        Mockito.when(repository.queryFirst(Mockito.isA(TagByIdSpecification.class))).thenReturn(Optional.of(FIRST_TAG));
         TagServiceImpl service = new TagServiceImpl(repository, validator);
 
-        Tag actual = service.findById(1);
+        Tag actual = service.findById(FIRST_TAG_ID);
 
-        assertEquals(expected, actual);
+        assertEquals(FIRST_TAG, actual);
     }
 
     @Test
@@ -39,14 +45,14 @@ class TagServiceImplTest {
         Mockito.when(repository.queryFirst(Mockito.isA(TagByIdSpecification.class))).thenReturn(Optional.empty());
         TagServiceImpl service = new TagServiceImpl(repository, validator);
 
-        assertThrows(EntityNotFoundException.class, () -> service.findById(1));
+        assertThrows(EntityNotFoundException.class, () -> service.findById(NON_EXISTING_ID));
     }
 
     @Test
     void testFindAllShouldReturnDtoForAllTags() {
         List<Tag> expected = List.of(
-                new Tag(1, "first"),
-                new Tag(2, "second")
+                FIRST_TAG,
+                SECOND_TAG
         );
 
         MainRepository<Tag> repository = Mockito.mock(MainRepository.class);
@@ -61,49 +67,47 @@ class TagServiceImplTest {
 
     @Test
     void testAddShouldAddTagToRepositoryIfNameIsUnique() {
-        Tag expected = new Tag(1, "first");
         MainRepository<Tag> repository = Mockito.mock(MainRepository.class);
-        Mockito.when(repository.add(Mockito.isA(Tag.class))).thenReturn(expected);
+        Mockito.when(repository.add(Mockito.isA(Tag.class))).thenReturn(FIRST_TAG);
         TagValidator validator = Mockito.mock(TagValidator.class);
-        Mockito.when(validator.validate(expected)).thenReturn(Collections.emptyMap());
+        Mockito.when(validator.validate(FIRST_TAG)).thenReturn(Collections.emptyMap());
         TagServiceImpl service = new TagServiceImpl(repository, validator);
 
-        Tag actual = service.add(expected);
+        Tag actual = service.add(FIRST_TAG);
 
-        Mockito.verify(repository, Mockito.times(1)).add(Mockito.eq(expected));
-        assertEquals(expected, actual);
+        Mockito.verify(repository, Mockito.times(1)).add(Mockito.eq(FIRST_TAG));
+        assertEquals(FIRST_TAG, actual);
     }
 
     @Test
     void testAddShouldThrowExceptionIfNameIsUsed() {
-        Tag tag = new Tag(1, "first");
         MainRepository<Tag> repository = Mockito.mock(MainRepository.class);
         Mockito.when(repository.exists(Mockito.isA(TagByNameSpecification.class))).thenReturn(true);
         TagValidator validator = Mockito.mock(TagValidator.class);
         TagServiceImpl service = new TagServiceImpl(repository, validator);
 
-        assertThrows(EntityAlreadyExistsException.class, () -> service.add(tag));
+        assertThrows(EntityAlreadyExistsException.class, () -> service.add(FIRST_TAG));
     }
 
     @Test
     void testRemoveShouldReturnTrueWhenTagIsRemoved() {
         MainRepository<Tag> repository = Mockito.mock(MainRepository.class);
-        Mockito.when(repository.remove(1)).thenReturn(true);
+        Mockito.when(repository.remove(FIRST_TAG_ID)).thenReturn(true);
         TagValidator validator = Mockito.mock(TagValidator.class);
         TagServiceImpl service = new TagServiceImpl(repository, validator);
 
-        assertTrue(service.remove(1));
-        Mockito.verify(repository, Mockito.times(1)).remove(Mockito.eq(1));
+        assertTrue(service.remove(FIRST_TAG_ID));
+        Mockito.verify(repository, Mockito.times(1)).remove(Mockito.eq(FIRST_TAG_ID));
     }
 
     @Test
     void testRemoveShouldReturnFalseIfTagNotRemoved() {
         MainRepository<Tag> repository = Mockito.mock(MainRepository.class);
-        Mockito.when(repository.remove(1)).thenReturn(false);
+        Mockito.when(repository.remove(FIRST_TAG_ID)).thenReturn(false);
         TagValidator validator = Mockito.mock(TagValidator.class);
         TagServiceImpl service = new TagServiceImpl(repository, validator);
 
-        assertFalse(service.remove(1));
-        Mockito.verify(repository, Mockito.times(1)).remove(Mockito.eq(1));
+        assertFalse(service.remove(FIRST_TAG_ID));
+        Mockito.verify(repository, Mockito.times(1)).remove(Mockito.eq(FIRST_TAG_ID));
     }
 }

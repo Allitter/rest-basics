@@ -41,7 +41,7 @@ public class TagController {
      * @return the tag with queried id {@link TagDto}
      */
     @GetMapping(value = "/{id}")
-    public TagDto findById(@PathVariable int id) {
+    public TagDto findById(@PathVariable long id) {
         Tag tag = tagService.findById(id);
         return EntityConverter.tagToDto(tag);
     }
@@ -66,7 +66,7 @@ public class TagController {
      * @return no content
      */
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity remove(@PathVariable int id) {
+    public ResponseEntity remove(@PathVariable long id) {
         tagService.remove(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

@@ -3,18 +3,17 @@ package com.epam.esm.repository;
 import com.epam.esm.config.TestConfig;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
-import com.epam.esm.repository.specification.*;
+import com.epam.esm.repository.specification.Specification;
 import com.epam.esm.repository.specification.impl.*;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -28,37 +27,36 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
 @WebAppConfiguration
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CertificateRepositoryTest {
     private static final int FIRST_TAG_INDEX = 0;
+    private static final int SECOND_TAG_INDEX = 1;
     private static final int THIRD_TAG_INDEX = 2;
     private static final int FOURTH_TAG_INDEX = 3;
-    private static final int SECOND_TAG_INDEX = 1;
-    private static final Certificate FIFTH_CERTIFICATE
-            = new Certificate.Builder()
-            .setId(5).setName("fifth certificate")
-            .setDescription("detailed description for fifth certificate")
-            .setPrice(200).setDuration(730)
-            .setCreateDate(LocalDate.of(2020, 12, 21))
-            .setLastUpdateDate(LocalDate.of(2020, 12, 31)).build();
+    private static final int FIRST_ELEMENT = 0;
+    private static final int NON_EXISTING_ID = -1;
+    private static final int FIRST_ELEMENT_ID = 1;
+    private static final int SECOND_ELEMENT = 1;
+    private static final int THIRD_ELEMENT = 2;
+    private static final int FOURTH_ELEMENT = 3;
 
-    private static final List<Tag> tags = List.of(
+    private static final List<Tag> TAGS = List.of(
             new Tag(1, "first tag"),
             new Tag(2, "second tag"),
             new Tag(3, "third tag"),
             new Tag(4, "fourth tag")
     );
-    private static final List<Certificate> certificates = List.of(
+    private static final List<Certificate> CERTIFICATES = List.of(
             new Certificate.Builder()
-                    .setId(1).setName("first certificate")
+                    .setId(FIRST_ELEMENT_ID).setName("first certificate")
                     .setDescription("detailed description for first certificate")
                     .setPrice(200).setDuration(365)
                     .setCreateDate(LocalDate.of(2021, 1, 21))
                     .setLastUpdateDate(LocalDate.of(2021, 2, 21))
                     .setTags(List.of(
-                            tags.get(FIRST_TAG_INDEX),
-                            tags.get(THIRD_TAG_INDEX),
-                            tags.get(FOURTH_TAG_INDEX)))
+                            TAGS.get(FIRST_TAG_INDEX),
+                            TAGS.get(THIRD_TAG_INDEX),
+                            TAGS.get(FOURTH_TAG_INDEX)))
                     .build(),
 
             new Certificate.Builder()
@@ -67,7 +65,7 @@ class CertificateRepositoryTest {
                     .setPrice(150).setDuration(365)
                     .setCreateDate(LocalDate.of(2021, 2, 21))
                     .setLastUpdateDate(LocalDate.of(2021, 3, 21))
-                    .setTags(List.of(tags.get(SECOND_TAG_INDEX)))
+                    .setTags(List.of(TAGS.get(SECOND_TAG_INDEX)))
                     .build(),
 
             new Certificate.Builder()
@@ -77,8 +75,8 @@ class CertificateRepositoryTest {
                     .setCreateDate(LocalDate.of(2021, 1, 21))
                     .setLastUpdateDate(LocalDate.of(2021, 2, 21))
                     .setTags(List.of(
-                            tags.get(SECOND_TAG_INDEX),
-                            tags.get(THIRD_TAG_INDEX)))
+                            TAGS.get(SECOND_TAG_INDEX),
+                            TAGS.get(THIRD_TAG_INDEX)))
                     .build(),
 
             new Certificate.Builder()
@@ -88,8 +86,8 @@ class CertificateRepositoryTest {
                     .setCreateDate(LocalDate.of(2020, 12, 21))
                     .setLastUpdateDate(LocalDate.of(2020, 12, 31))
                     .setTags(List.of(
-                            tags.get(FIRST_TAG_INDEX),
-                            tags.get(THIRD_TAG_INDEX)))
+                            TAGS.get(FIRST_TAG_INDEX),
+                            TAGS.get(THIRD_TAG_INDEX)))
                     .build()
     );
 
@@ -103,18 +101,22 @@ class CertificateRepositoryTest {
 
     public static Object[][] queries() {
         return new Object[][]{
-                {new CertificateAllSpecification(), certificates},
-                {new CertificateByNameSpecification("third"), List.of(certificates.get(2))},
-                {new CertificateByDescriptionSpecification("fourth"), List.of(certificates.get(3))},
-                {new CertificateByTagNameSpecification("second"), List.of(certificates.get(1), certificates.get(2))},
-                {new CertificateByIdSpecification(1), List.of(certificates.get(0))},
+                {new CertificateAllSpecification(), CERTIFICATES},
+                {new CertificateByNameSpecification("third"), List.of(CERTIFICATES.get(THIRD_ELEMENT))},
+                {new CertificateByDescriptionSpecification("fourth"), List.of(CERTIFICATES.get(FOURTH_ELEMENT))},
+                {new CertificateByTagNameSpecification("second"), List.of(CERTIFICATES.get(SECOND_ELEMENT), CERTIFICATES.get(THIRD_ELEMENT))},
+                {new CertificateByIdSpecification(FIRST_ELEMENT_ID), List.of(CERTIFICATES.get(FIRST_ELEMENT))},
         };
     }
 
     @Test
-    @Order(1)
     void testAddShouldAddCertificateToDataSourceIfCertificateNotYetCreated() {
-        Certificate expected = FIFTH_CERTIFICATE;
+        Certificate expected = new Certificate.Builder()
+                .setId(5).setName("fifth certificate")
+                .setDescription("detailed description for fifth certificate")
+                .setPrice(200).setDuration(730)
+                .setCreateDate(LocalDate.of(2020, 12, 21))
+                .setLastUpdateDate(LocalDate.of(2020, 12, 31)).build();
 
         Certificate actual = certificateRepository.add(expected);
 
@@ -122,11 +124,11 @@ class CertificateRepositoryTest {
     }
 
     @Test
-    @Order(2)
     void testUpdateShouldUpdateCertificateTIfCertificateIsAlreadyExist() {
-        Certificate expected = FIFTH_CERTIFICATE;
+        Certificate expected = CERTIFICATES.get(FIRST_ELEMENT);
+        String newDescription = "new description";
         expected = new Certificate.Builder(expected)
-                .setDescription("new description").build();
+                .setDescription(newDescription).build();
 
         Certificate actual = certificateRepository.update(expected);
 
@@ -134,20 +136,17 @@ class CertificateRepositoryTest {
     }
 
     @Test
-    @Order(3)
     void testRemoveShouldReturnTrueIfDeletedCertificateFromDataSourceIfExists() {
-        assertTrue(certificateRepository.remove(5));
+        assertTrue(certificateRepository.remove(FIRST_ELEMENT_ID));
     }
 
     @Test
-    @Order(4)
     void testRemoveShouldReturnFalseIfNotDeletedCertificateFromDataSourceIfExists() {
-        assertFalse(certificateRepository.remove(-1));
+        assertFalse(certificateRepository.remove(NON_EXISTING_ID));
     }
 
     @ParameterizedTest
     @MethodSource("queries")
-    @Order(6)
     void testQueryShouldReturnListOfCertificatesMatchingTheSpecification(Specification<Certificate> specification, List<Certificate> expected) {
         List<Certificate> actual = certificateRepository.query(specification);
 
@@ -155,11 +154,10 @@ class CertificateRepositoryTest {
     }
 
     @Test
-    @Order(5)
     void testQuerySingleShouldReturnFirstResultForSpecification() {
-        Certificate expected = certificates.get(0);
+        Certificate expected = CERTIFICATES.get(FIRST_ELEMENT);
 
-        Certificate actual = certificateRepository.queryFirst(new CertificateByIdSpecification(1)).get();
+        Certificate actual = certificateRepository.queryFirst(new CertificateByIdSpecification(FIRST_ELEMENT_ID)).get();
 
         assertEquals(expected, actual);
     }

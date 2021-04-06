@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ValidationError extends RuntimeException {
-    private final Map<String, String> validations;
+    private final Map<String, String> validationFails;
 
-    public ValidationError(Map<String, String> validations) {
-        this.validations = new HashMap<>(validations);
+    public ValidationError(Map<String, String> validationFails) {
+        this.validationFails = new HashMap<>(validationFails);
     }
 
-    public Map<String, String> getValidations() {
-        return Collections.unmodifiableMap(validations);
+    public Map<String, String> getValidationFails() {
+        return Collections.unmodifiableMap(validationFails);
     }
 }

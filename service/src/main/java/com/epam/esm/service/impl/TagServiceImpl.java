@@ -27,7 +27,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag findById(int id) {
+    public Tag findById(long id) {
         Optional<Tag> optionalTag = repository.queryFirst(new TagByIdSpecification(id));
         return optionalTag.orElseThrow(EntityNotFoundException::new);
     }
@@ -52,7 +52,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean remove(int id) {
+    public boolean remove(long id) {
         return repository.remove(id);
     }
 }

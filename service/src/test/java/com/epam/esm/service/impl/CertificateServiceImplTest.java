@@ -133,6 +133,7 @@ class CertificateServiceImplTest {
     void TestUpdateShouldUpdateCertificate() {
         int newPrice = 1000;
         Certificate certificate = new Certificate.Builder(CERTIFICATE).setLastUpdateDate(LocalDate.now()).setPrice(newPrice).build();
+
         MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
         MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
         CertificateValidator validator = Mockito.mock(CertificateValidator.class);

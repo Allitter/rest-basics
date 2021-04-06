@@ -1,11 +1,10 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.exception.RepositoryError;
-import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Entity;
-import com.epam.esm.repository.specification.CertificateSpecificationCompressor;
 import com.epam.esm.repository.specification.Specification;
 import com.epam.esm.repository.specification.SpecificationCompressor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,6 +20,9 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM %s WHERE id = ?";
     private static final String ID_ATTRIBUTE = "id";
     private static final String EXISTS_QUERY = "SELECT EXISTS(%s) as ex";
+    private static final int ONE_ROW_AFFECTED = 1;
+    private static final int FIRST_ELEMENT = 0;
+    private static final int PREPARED_STATEMENT_PARAMETER_BIAS = 1;
     protected final JdbcTemplate jdbcTemplate;
     protected final RowMapper<T> mapper;
     protected final SpecificationCompressor<T> specificationCompressor;
@@ -32,13 +34,13 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
         this.specificationCompressor = specificationCompressor;
     }
 
-    protected int insert(String query, Object...params) {
+    protected int insert(String query, Object... params) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         PreparedStatementCreator statementCreator = connection -> {
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            for (int i = 1; i <= params.length; i++) {
-                ps.setObject(i, params[i - 1]);
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + PREPARED_STATEMENT_PARAMETER_BIAS, params[i]);
             }
             return ps;
         };
@@ -49,9 +51,9 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
     }
 
     @Override
-    public boolean remove(int id) {
+    public boolean remove(long id) {
         String query = String.format(DELETE_BY_ID_QUERY, getTableName());
-        return jdbcTemplate.update(query, id) == 1;
+        return jdbcTemplate.update(query, id) == ONE_ROW_AFFECTED;
     }
 
     protected abstract String getTableName();
@@ -64,12 +66,12 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
     @Override
     public Optional<T> queryFirst(Specification<T> specification) {
         List<T> list = query(specification);
-        return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
+        return list.isEmpty() ? Optional.empty() : Optional.of(list.get(FIRST_ELEMENT));
     }
 
     @Override
-    public List<T> query(List<Specification<T>> specifications)  {
-        if (specifications == null || specifications.isEmpty()) {
+    public List<T> query(List<Specification<T>> specifications) {
+        if (CollectionUtils.isEmpty(specifications)) {
             throw new RepositoryError();
         }
 

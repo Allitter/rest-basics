@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CertificateRepository extends AbstractRepository<Certificate> {
@@ -22,7 +23,6 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
     private static final String UPDATE_QUERY = "UPDATE certificate SET name = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = ? WHERE id = ?;";
     private static final String ADD_TAG_QUERY = "INSERT INTO certificate_tag(id_certificate, id_tag) VALUES (?, ?);";
     private static final String REMOVE_CERTIFICATE_TAGS_QUERY = "DELETE FROM certificate_tag WHERE id_certificate = ?;";
-
 
     private final RowMapper<Tag> tagRowMapper;
 
@@ -38,8 +38,8 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
         int certificateId = insert(INSERT_QUERY, fields.toArray());
         List<Tag> tags = certificate.getTags();
         tags.forEach(tag -> jdbcTemplate.update(ADD_TAG_QUERY, certificateId, tag.getId()));
-
-        return this.queryFirst(new CertificateByIdSpecification(certificateId)).orElseThrow(EntityNotFoundException::new);
+        Optional<Certificate> optionalCertificate = queryFirst(new CertificateByIdSpecification(certificateId));
+        return optionalCertificate.orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -52,8 +52,8 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
         jdbcTemplate.update(REMOVE_CERTIFICATE_TAGS_QUERY, certificateId);
         List<Tag> tags = certificate.getTags();
         tags.forEach(tag -> jdbcTemplate.update(ADD_TAG_QUERY, certificateId, tag.getId()));
-
-        return this.queryFirst(new CertificateByIdSpecification(certificateId)).orElseThrow(EntityNotFoundException::new);
+        Optional<Certificate> optionalCertificate = queryFirst(new CertificateByIdSpecification(certificateId));
+        return optionalCertificate.orElseThrow(EntityNotFoundException::new);
     }
 
     private List<Object> extractNonIdFields(Certificate certificate) {

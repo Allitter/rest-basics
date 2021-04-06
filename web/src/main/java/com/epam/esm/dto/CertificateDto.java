@@ -96,8 +96,12 @@ public class CertificateDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         CertificateDto that = (CertificateDto) o;
         return id == that.id
                 && price == that.price

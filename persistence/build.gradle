@@ -8,4 +8,5 @@ dependencies {
     implementation 'org.postgresql:postgresql'
 
     implementation 'org.apache.commons:commons-lang3'
+    implementation 'org.apache.commons:commons-collections4'
 }

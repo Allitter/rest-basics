@@ -43,7 +43,7 @@ public class CertificateController {
      * @return the {@link CertificateDto} of queried certificate
      */
     @GetMapping(value = "/{id}")
-    public CertificateDto findById(@PathVariable int id) {
+    public CertificateDto findById(@PathVariable long id) {
         Certificate certificate = certificateService.findById(id);
         return EntityConverter.certificateToDto(certificate);
     }
@@ -69,7 +69,7 @@ public class CertificateController {
      * @return the updated certificate {@link CertificateDto}
      */
     @PutMapping(value = "/{id}")
-    public CertificateDto update(@PathVariable int id, @RequestBody CertificateDto dto) {
+    public CertificateDto update(@PathVariable long id, @RequestBody CertificateDto dto) {
         dto.setId(id);
         Certificate certificate = EntityConverter.dtoToCertificate(dto);
         Certificate updated = certificateService.update(certificate);
@@ -83,7 +83,7 @@ public class CertificateController {
      * @return no content
      */
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity remove(@PathVariable int id) {
+    public ResponseEntity remove(@PathVariable long id) {
         certificateService.remove(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

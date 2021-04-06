@@ -29,6 +29,6 @@ create TABLE certificate_tag
     CONSTRAINT pk_certificate_tag PRIMARY KEY (
         id_tag, id_certificate
     ),
-    FOREIGN KEY (id_tag) REFERENCES tag (id),
-    FOREIGN KEY (id_certificate) REFERENCES certificate (id)
+    FOREIGN KEY (id_tag) REFERENCES tag (id) ON DELETE CASCADE,
+    FOREIGN KEY (id_certificate) REFERENCES certificate (id) ON DELETE CASCADE
 );

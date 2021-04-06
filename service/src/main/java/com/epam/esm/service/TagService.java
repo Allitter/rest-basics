@@ -15,7 +15,7 @@ public interface TagService {
      * @param id the id to search
      * @return {@link Tag}
      */
-    Tag findById(int id);
+    Tag findById(long id);
 
     /**
      * Finds all tags
@@ -38,6 +38,6 @@ public interface TagService {
      * @param id the id
      * @return true if removed, false otherwise
      */
-    boolean remove(int id);
+    boolean remove(long id);
 
 }

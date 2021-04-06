@@ -30,6 +30,7 @@ subprojects {
 
         // apache commons
         implementation 'org.apache.commons:commons-lang3:3.0'
+        implementation 'org.apache.commons:commons-collections4:4.4'
 
         // db
         implementation 'org.springframework:spring-jdbc:5.3.5'
