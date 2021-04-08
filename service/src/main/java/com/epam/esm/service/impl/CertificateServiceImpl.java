@@ -142,22 +142,23 @@ public class CertificateServiceImpl implements CertificateService {
             specifications.add(new CertificateAllSpecification());
         }
 
-        Stream<Certificate> certificates = repository.query(specifications).stream();
+        List<Certificate> certificates = repository.query(specifications);
+        Stream<Certificate> certificateStream = certificates.stream();
 
         if (nonNull(queryObject.getSortDate())) {
             boolean isAscending = StringUtils.containsIgnoreCase(queryObject.getSortDate(), ASCENDING_SORT);
-            certificates = isAscending
-                    ? certificates.sorted(Comparator.comparing(Certificate::getCreateDate))
-                    : certificates.sorted((first, second) -> second.getCreateDate().compareTo(first.getCreateDate()));
+            certificateStream = isAscending
+                    ? certificateStream.sorted(Comparator.comparing(Certificate::getCreateDate))
+                    : certificateStream.sorted((first, second) -> second.getCreateDate().compareTo(first.getCreateDate()));
         }
 
         if (StringUtils.isNotBlank(queryObject.getSortName())) {
             boolean isAscending = StringUtils.containsIgnoreCase(queryObject.getSortName(), ASCENDING_SORT);
-            certificates = isAscending
-                    ? certificates.sorted(Comparator.comparing(Certificate::getName))
-                    : certificates.sorted((first, second) -> second.getName().compareTo(first.getName()));
+            certificateStream = isAscending
+                    ? certificateStream.sorted(Comparator.comparing(Certificate::getName))
+                    : certificateStream.sorted((first, second) -> second.getName().compareTo(first.getName()));
         }
 
-        return certificates.collect(Collectors.toList());
+        return certificateStream.collect(Collectors.toList());
     }
 }

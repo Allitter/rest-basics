@@ -5,6 +5,7 @@ import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.MainRepository;
 import com.epam.esm.repository.specification.impl.*;
+import com.epam.esm.service.CertificateQueryObject;
 import com.epam.esm.validator.CertificateValidator;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
@@ -32,8 +33,7 @@ class CertificateServiceImplTest {
     private static final Tag FIRST_TAG = new Tag(1, "tag");
     private static final Tag SECOND_TAG = new Tag(2, "another tag");
     private static final List<Tag> TAGS = List.of(FIRST_TAG, SECOND_TAG);
-    private static final Certificate CERTIFICATE
-            = new Certificate.Builder()
+    private static final Certificate CERTIFICATE = new Certificate.Builder()
             .setId(ID)
             .setName(NAME)
             .setDescription(DESCRIPTION)
@@ -44,13 +44,23 @@ class CertificateServiceImplTest {
             .setTags(new ArrayList<>(TAGS))
             .build();
 
+    private static final Certificate SECOND_CERTIFICATE = new Certificate.Builder()
+            .setId(2)
+            .setName("second name")
+            .setDescription("second description")
+            .setCreateDate(LocalDate.now().minusDays(1))
+            .setTags(List.of(FIRST_TAG))
+            .build();
+
+
+    private final MainRepository<Certificate> certificateRepository = Mockito.mock(MainRepository.class);
+    private final MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
+    private final CertificateValidator certificateValidator = Mockito.mock(CertificateValidator.class);
+    private final CertificateServiceImpl service = new CertificateServiceImpl(certificateRepository, tagRepository, certificateValidator);
+
     @Test
     void testFindByIdShouldReturnCertificateWithQueriedIdIfSuchExist() {
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(repository.queryFirst(Mockito.isA(CertificateByIdSpecification.class))).thenReturn(Optional.of(CERTIFICATE));
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
+        Mockito.when(certificateRepository.queryFirst(Mockito.isA(CertificateByIdSpecification.class))).thenReturn(Optional.of(CERTIFICATE));
 
         Certificate actual = service.findById(ID);
 
@@ -60,11 +70,7 @@ class CertificateServiceImplTest {
     @Test
     void testFindAllShouldReturnAllCertificates() {
         List<Certificate> certificates = Collections.emptyList();
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(repository.query(Mockito.isA(CertificateAllSpecification.class))).thenReturn(certificates);
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
+        Mockito.when(certificateRepository.query(Mockito.isA(CertificateAllSpecification.class))).thenReturn(certificates);
 
         List<Certificate> actual = service.findAll();
 
@@ -74,11 +80,7 @@ class CertificateServiceImplTest {
     @Test
     void findByTagNameShouldReturnCertificateStreamWithSimilarTagNames() {
         List<Certificate> certificates = Collections.emptyList();
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(repository.query(Mockito.isA(CertificateByTagNameSpecification.class))).thenReturn(certificates);
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
+        Mockito.when(certificateRepository.query(Mockito.isA(CertificateByTagNameSpecification.class))).thenReturn(certificates);
 
         List<Certificate> actual = service.findByTagName(ANY_TEXT);
 
@@ -88,11 +90,7 @@ class CertificateServiceImplTest {
     @Test
     void findByNameShouldReturnCertificateStreamWithSimilarName() {
         List<Certificate> certificates = Collections.emptyList();
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(repository.query(Mockito.isA(CertificateByNameSpecification.class))).thenReturn(certificates);
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
+        Mockito.when(certificateRepository.query(Mockito.isA(CertificateByNameSpecification.class))).thenReturn(certificates);
 
         List<Certificate> actual = service.findByName(ANY_TEXT);
 
@@ -102,11 +100,7 @@ class CertificateServiceImplTest {
     @Test
     void findByDescriptionShouldReturnCertificateStreamWithSimilarDescription() {
         List<Certificate> certificates = Collections.emptyList();
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(repository.query(Mockito.isA(CertificateByDescriptionSpecification.class))).thenReturn(certificates);
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
+        Mockito.when(certificateRepository.query(Mockito.isA(CertificateByDescriptionSpecification.class))).thenReturn(certificates);
 
         List<Certificate> actual = service.findByDescription(ANY_TEXT);
 
@@ -115,14 +109,10 @@ class CertificateServiceImplTest {
 
     @Test
     void testAddShouldAddCertificateToRepository() {
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        Mockito.when(repository.add(Mockito.eq(CERTIFICATE))).thenReturn(CERTIFICATE);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(validator.validateForCreate(CERTIFICATE)).thenReturn(Collections.emptyMap());
+        Mockito.when(certificateRepository.add(Mockito.eq(CERTIFICATE))).thenReturn(CERTIFICATE);
+        Mockito.when(certificateValidator.validateForCreate(CERTIFICATE)).thenReturn(Collections.emptyMap());
         Mockito.when(tagRepository.queryFirst(Mockito.isA(TagByNameSpecification.class))).thenReturn(Optional.empty());
         doAnswer(AdditionalAnswers.returnsFirstArg()).when(tagRepository).add(any());
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
 
         Certificate actual = service.add(CERTIFICATE);
 
@@ -133,16 +123,11 @@ class CertificateServiceImplTest {
     void TestUpdateShouldUpdateCertificate() {
         int newPrice = 1000;
         Certificate certificate = new Certificate.Builder(CERTIFICATE).setLastUpdateDate(LocalDate.now()).setPrice(newPrice).build();
-
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(validator.validateForCreate(certificate)).thenReturn(Collections.emptyMap());
-        Mockito.when(repository.update(Mockito.eq(certificate))).thenReturn(certificate);
-        Mockito.when(repository.queryFirst(Mockito.isA(CertificateByIdSpecification.class))).thenReturn(Optional.of(CERTIFICATE));
+        Mockito.when(certificateValidator.validateForCreate(certificate)).thenReturn(Collections.emptyMap());
+        Mockito.when(certificateRepository.update(Mockito.eq(certificate))).thenReturn(certificate);
+        Mockito.when(certificateRepository.queryFirst(Mockito.isA(CertificateByIdSpecification.class))).thenReturn(Optional.of(CERTIFICATE));
         Mockito.when(tagRepository.queryFirst(Mockito.isA(TagByNameSpecification.class))).thenReturn(Optional.empty());
         doAnswer(AdditionalAnswers.returnsFirstArg()).when(tagRepository).add(any());
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
 
         Certificate actual = service.update(certificate);
 
@@ -151,35 +136,130 @@ class CertificateServiceImplTest {
 
     @Test
     void TestUpdateShouldThrowExceptionIfCertificateNotPresent() {
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(validator.validateForCreate(Mockito.any())).thenReturn(Collections.emptyMap());
-        Mockito.when(repository.queryFirst(Mockito.isA(CertificateByIdSpecification.class))).thenReturn(Optional.empty());
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
+        Mockito.when(certificateValidator.validateForCreate(Mockito.any())).thenReturn(Collections.emptyMap());
+        Mockito.when(certificateRepository.queryFirst(Mockito.isA(CertificateByIdSpecification.class))).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> service.update(CERTIFICATE));
     }
 
     @Test
     void testRemoveShouldReturnTrueIfRemoved() {
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(repository.remove(ID)).thenReturn(true);
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
+        Mockito.when(certificateRepository.remove(ID)).thenReturn(true);
 
         assertTrue(service.remove(ID));
     }
 
     @Test
     void testRemoveShouldReturnFalseIfNotRemoved() {
-        MainRepository<Certificate> repository = Mockito.mock(MainRepository.class);
-        MainRepository<Tag> tagRepository = Mockito.mock(MainRepository.class);
-        CertificateValidator validator = Mockito.mock(CertificateValidator.class);
-        Mockito.when(repository.remove(ID)).thenReturn(false);
-        CertificateServiceImpl service = new CertificateServiceImpl(repository, tagRepository, validator);
+        Mockito.when(certificateRepository.remove(ID)).thenReturn(false);
 
         assertFalse(service.remove(ID));
+    }
+
+    @Test
+    void testFindCertificatesByQueryObjectShouldFindCertificatesByNameIfSet() {
+        Mockito.when(certificateRepository.query(Mockito.anyList())).thenReturn(List.of(CERTIFICATE));
+        CertificateQueryObject queryObject = new CertificateQueryObject(NAME, null, null, null, null);
+        List<Certificate> expected = List.of(CERTIFICATE);
+
+        List<Certificate> actual = service.findCertificatesByQueryObject(queryObject);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindCertificatesByQueryObjectShouldFindCertificatesByDescriptionIfSet() {
+        Mockito.when(certificateRepository.query(Mockito.anyList())).thenReturn(List.of(CERTIFICATE));
+        CertificateQueryObject queryObject = new CertificateQueryObject(null, null, DESCRIPTION, null, null);
+        List<Certificate> expected = List.of(CERTIFICATE);
+
+        List<Certificate> actual = service.findCertificatesByQueryObject(queryObject);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindCertificatesByQueryObjectShouldFindCertificatesByTagNameIfSet() {
+        Mockito.when(certificateRepository.query(Mockito.anyList())).thenReturn(List.of(CERTIFICATE));
+        CertificateQueryObject queryObject = new CertificateQueryObject(null, FIRST_TAG.getName(), null, null, null);
+        List<Certificate> expected = List.of(CERTIFICATE);
+
+        List<Certificate> actual = service.findCertificatesByQueryObject(queryObject);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindCertificatesByQueryObjectShouldFindAllCertificatesIfNoParametersSet() {
+        Mockito.when(certificateRepository.query(Mockito.anyList())).thenReturn(List.of(CERTIFICATE));
+        CertificateQueryObject queryObject = new CertificateQueryObject(null, null, null, null, null);
+        List<Certificate> expected = List.of(CERTIFICATE);
+
+        List<Certificate> actual = service.findCertificatesByQueryObject(queryObject);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindCertificatesByQueryObjectShouldFindCertificatesByMultipleParametersIfSet() {
+        Mockito.when(certificateRepository.query(Mockito.anyList())).thenReturn(List.of(CERTIFICATE));
+        CertificateQueryObject queryObject = new CertificateQueryObject(NAME, FIRST_TAG.getName(), DESCRIPTION, null, null);
+        List<Certificate> expected = List.of(CERTIFICATE);
+
+        List<Certificate> actual = service.findCertificatesByQueryObject(queryObject);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindCertificatesByQueryObjectShouldSortCertificatesByByNameAscendingIfAscSet() {
+        Mockito.when(certificateRepository.query(Mockito.anyList()))
+                .thenReturn(List.of(SECOND_CERTIFICATE, CERTIFICATE));
+
+        CertificateQueryObject queryObject = new CertificateQueryObject(null, null, null, "asc", null);
+        List<Certificate> expected = List.of(CERTIFICATE, SECOND_CERTIFICATE);
+
+        List<Certificate> actual = service.findCertificatesByQueryObject(queryObject);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindCertificatesByQueryObjectShouldSortCertificatesByByNameDescendingIfDescSet() {
+        Mockito.when(certificateRepository.query(Mockito.anyList()))
+                .thenReturn(List.of(CERTIFICATE, SECOND_CERTIFICATE));
+
+        CertificateQueryObject queryObject = new CertificateQueryObject(null, null, null, "desc", null);
+        List<Certificate> expected = List.of(SECOND_CERTIFICATE, CERTIFICATE);
+
+        List<Certificate> actual = service.findCertificatesByQueryObject(queryObject);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindCertificatesByQueryObjectShouldSortCertificatesByByCreateDateAscendingIfAscSet() {
+        Mockito.when(certificateRepository.query(Mockito.anyList()))
+                .thenReturn(List.of(SECOND_CERTIFICATE, CERTIFICATE));
+
+        CertificateQueryObject queryObject = new CertificateQueryObject(null, null, null, null, "asc");
+        List<Certificate> expected = List.of(SECOND_CERTIFICATE, CERTIFICATE);
+
+        List<Certificate> actual = service.findCertificatesByQueryObject(queryObject);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindCertificatesByQueryObjectShouldSortCertificatesByByCreateDateDescendingIfDescSet() {
+        Mockito.when(certificateRepository.query(Mockito.anyList()))
+                .thenReturn(List.of(SECOND_CERTIFICATE, CERTIFICATE));
+
+        CertificateQueryObject queryObject = new CertificateQueryObject(null, null, null, null, "desc");
+        List<Certificate> expected = List.of(CERTIFICATE, SECOND_CERTIFICATE);
+
+        List<Certificate> actual = service.findCertificatesByQueryObject(queryObject);
+
+        assertEquals(expected, actual);
     }
 }
