@@ -5,7 +5,6 @@ import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.repository.specification.Specification;
 import com.epam.esm.repository.specification.impl.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,10 +12,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
 @WebAppConfiguration
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Transactional
 class CertificateRepositoryTest {
     private static final int FIRST_TAG_INDEX = 0;
     private static final int SECOND_TAG_INDEX = 1;
@@ -110,6 +110,7 @@ class CertificateRepositoryTest {
     }
 
     @Test
+    @Rollback
     void testAddShouldAddCertificateToDataSourceIfCertificateNotYetCreated() {
         Certificate expected = new Certificate.Builder()
                 .setId(5).setName("fifth certificate")
@@ -124,6 +125,7 @@ class CertificateRepositoryTest {
     }
 
     @Test
+    @Rollback
     void testUpdateShouldUpdateCertificateTIfCertificateIsAlreadyExist() {
         Certificate expected = CERTIFICATES.get(FIRST_ELEMENT);
         String newDescription = "new description";
@@ -136,17 +138,20 @@ class CertificateRepositoryTest {
     }
 
     @Test
+    @Rollback
     void testRemoveShouldReturnTrueIfDeletedCertificateFromDataSourceIfExists() {
         assertTrue(certificateRepository.remove(FIRST_ELEMENT_ID));
     }
 
     @Test
+    @Rollback
     void testRemoveShouldReturnFalseIfNotDeletedCertificateFromDataSourceIfExists() {
         assertFalse(certificateRepository.remove(NON_EXISTING_ID));
     }
 
     @ParameterizedTest
     @MethodSource("queries")
+    @Rollback
     void testQueryShouldReturnListOfCertificatesMatchingTheSpecification(Specification<Certificate> specification, List<Certificate> expected) {
         List<Certificate> actual = certificateRepository.query(specification);
 
@@ -154,6 +159,7 @@ class CertificateRepositoryTest {
     }
 
     @Test
+    @Rollback
     void testQuerySingleShouldReturnFirstResultForSpecification() {
         Certificate expected = CERTIFICATES.get(FIRST_ELEMENT);
 

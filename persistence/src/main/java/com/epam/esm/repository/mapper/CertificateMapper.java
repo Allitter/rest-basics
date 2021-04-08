@@ -13,7 +13,7 @@ public class CertificateMapper implements RowMapper<Certificate> {
 
     @Override
     public Certificate mapRow(ResultSet rs, int rowNum) throws SQLException {
-        int id = rs.getInt("id");
+        long id = rs.getLong("id");
         int price = rs.getInt("price");
         int duration = rs.getInt("duration");
         String name = rs.getString("name");

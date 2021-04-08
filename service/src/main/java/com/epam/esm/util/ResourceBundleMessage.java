@@ -10,7 +10,9 @@ public final class ResourceBundleMessage {
     public static final String CERTIFICATE_NAME_FORMAT = "certificate.name.format";
     public static final String CERTIFICATE_DESCRIPTION_EMPTY = "certificate.description.empty";
     public static final String CERTIFICATE_DESCRIPTION_FORMAT = "certificate.description.format";
+    public static final String CERTIFICATE_PRICE_EMPTY = "certificate.price.empty";
     public static final String CERTIFICATE_PRICE_FORMAT = "certificate.price.format";
+    public static final String CERTIFICATE_DURATION_EMPTY = "certificate.duration.empty";
     public static final String CERTIFICATE_DURATION_FORMAT = "certificate.duration.format";
 
     private ResourceBundleMessage() {

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Component
 public class CertificateValidatorImpl implements CertificateValidator {
@@ -53,13 +54,15 @@ public class CertificateValidatorImpl implements CertificateValidator {
         if (StringUtils.isNotBlank(certificate.getDescription())) {
             fails.putAll(validateDescription(certificate.getDescription()));
         }
-        if (certificate.getDuration() != ZERO) {
+        if (Objects.nonNull(certificate.getPrice())) {
+            fails.putAll(validatePrice(certificate.getPrice()));
+        }
+        if (Objects.nonNull(certificate.getDuration())) {
             fails.putAll(validateDuration(certificate.getDuration()));
         }
         if (CollectionUtils.isNotEmpty(certificate.getTags())) {
             fails.putAll(validateTags(certificate.getTags()));
         }
-        fails.putAll(validatePrice(certificate.getPrice()));
 
         return fails;
     }
@@ -94,8 +97,12 @@ public class CertificateValidatorImpl implements CertificateValidator {
         return fails;
     }
 
-    public Map<String, String> validatePrice(int price) {
+    public Map<String, String> validatePrice(Integer price) {
         Map<String, String> fails = new HashMap<>();
+        if (Objects.isNull(price)) {
+            fails.put(PRICE_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_PRICE_EMPTY);
+            return fails;
+        }
         if (price < MIN_PRICE) {
             fails.put(PRICE_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_PRICE_FORMAT);
         }
@@ -103,8 +110,12 @@ public class CertificateValidatorImpl implements CertificateValidator {
         return fails;
     }
 
-    public Map<String, String> validateDuration(int duration) {
+    public Map<String, String> validateDuration(Integer duration) {
         Map<String, String> fails = new HashMap<>();
+        if (Objects.isNull(duration)) {
+            fails.put(DESCRIPTION_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_DURATION_EMPTY);
+            return fails;
+        }
         if (duration < MIN_DURATION) {
             fails.put(DURATION_ATTRIBUTE, ResourceBundleMessage.CERTIFICATE_DURATION_FORMAT);
         }

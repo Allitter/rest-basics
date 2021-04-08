@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +40,7 @@ public class ControllerExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleValidationException(ValidationException e, Locale locale) {
         List<String> messages = e.getValidationFails()
                 .values().stream()
-                .map(validation -> messageSource.getMessage(validation, new Object[]{}, locale))
+                .map(validationFail -> messageSource.getMessage(validationFail, new Object[]{}, locale))
                 .collect(Collectors.toList());
 
         ExceptionResponse response = new ExceptionResponse(HttpStatus.BAD_REQUEST.value(), messages);

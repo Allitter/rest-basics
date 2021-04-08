@@ -8,6 +8,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
@@ -20,6 +21,7 @@ import java.util.List;
 @EnableWebMvc
 @Configuration
 @ComponentScan(basePackages = "com.epam.esm")
+@Import({RepositoryConfig.class, ServiceConfig.class})
 public class SpringConfig implements WebMvcConfigurer {
     private static final String EXCEPTION_MESSAGE_BUNDLE = "exception.message";
     private static final String DEFAULT_ENCODING = "UTF-8";

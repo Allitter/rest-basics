@@ -11,7 +11,9 @@ import java.util.stream.Collectors;
 public final class EntityConverter {
 
     public static CertificateDto certificateToDto(Certificate certificate) {
-        List<TagDto> tagDtos = certificate.getTags().stream().map(EntityConverter::tagToDto).collect(Collectors.toList());
+        List<TagDto> tagDtos = certificate.getTags().stream()
+                .map(EntityConverter::tagToDto)
+                .collect(Collectors.toList());
 
         return new CertificateDto(
                 certificate.getId(),
@@ -25,7 +27,9 @@ public final class EntityConverter {
     }
 
     public static Certificate dtoToCertificate(CertificateDto dto) {
-        List<Tag> tags = dto.getTags().stream().map(EntityConverter::dtoToTag).collect(Collectors.toList());
+        List<Tag> tags = dto.getTags().stream()
+                .map(EntityConverter::dtoToTag)
+                .collect(Collectors.toList());
 
         return new Certificate.Builder()
                 .setId(dto.getId())

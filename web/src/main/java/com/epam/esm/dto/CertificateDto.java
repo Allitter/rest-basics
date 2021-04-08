@@ -1,6 +1,9 @@
 package com.epam.esm.dto;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -9,17 +12,20 @@ public class CertificateDto {
     private long id;
     private String name;
     private String description;
-    private int price;
-    private int duration;
+    private Integer price;
+    private Integer duration;
     private LocalDate createDate;
     private LocalDate lastUpdateDate;
     private List<TagDto> tags;
 
     public CertificateDto() {
+        tags = new ArrayList<>();
     }
 
-    public CertificateDto(long id, String name, String description, int price, int duration,
+    public CertificateDto(long id, String name, String description, Integer price, Integer duration,
                           LocalDate createDate, LocalDate lastUpdateDate, List<TagDto> tags) {
+        super();
+
         this.id = id;
         this.name = name;
         this.description = description;
@@ -27,7 +33,10 @@ public class CertificateDto {
         this.duration = duration;
         this.createDate = createDate;
         this.lastUpdateDate = lastUpdateDate;
-        this.tags = tags;
+
+        if (CollectionUtils.isNotEmpty(tags)) {
+            this.tags = tags;
+        }
     }
 
     public long getId() {
@@ -54,19 +63,19 @@ public class CertificateDto {
         this.description = description;
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
-    public int getDuration() {
+    public Integer getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(Integer duration) {
         this.duration = duration;
     }
 
@@ -91,31 +100,11 @@ public class CertificateDto {
     }
 
     public void setTags(List<TagDto> tags) {
-        this.tags = tags;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+        if (CollectionUtils.isEmpty(tags)) {
+            return;
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        CertificateDto that = (CertificateDto) o;
-        return id == that.id
-                && price == that.price
-                && duration == that.duration
-                && Objects.equals(name, that.name)
-                && Objects.equals(description, that.description)
-                && Objects.equals(createDate, that.createDate)
-                && Objects.equals(lastUpdateDate, that.lastUpdateDate)
-                && Objects.equals(tags, that.tags);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, price, duration, createDate, lastUpdateDate, tags);
+        this.tags = new ArrayList<>(tags);
     }
 
     @Override
@@ -130,5 +119,25 @@ public class CertificateDto {
                 .add("lastUpdateDate=" + lastUpdateDate)
                 .add("tags=" + tags)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CertificateDto that = (CertificateDto) o;
+        return id == that.id
+                && Objects.equals(name, that.name)
+                && Objects.equals(description, that.description)
+                && Objects.equals(price, that.price)
+                && Objects.equals(duration, that.duration)
+                && Objects.equals(createDate, that.createDate)
+                && Objects.equals(lastUpdateDate, that.lastUpdateDate)
+                && Objects.equals(tags, that.tags);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, price, duration, createDate, lastUpdateDate, tags);
     }
 }

@@ -3,6 +3,7 @@ package com.epam.esm.model;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -12,8 +13,8 @@ import static java.util.Objects.hash;
 public class Certificate extends Entity {
     private final String name;
     private final String description;
-    private final int price;
-    private final int duration;
+    private final Integer price;
+    private final Integer duration;
     private final LocalDate createDate;
     private final LocalDate lastUpdateDate;
     private final List<Tag> tags;
@@ -37,11 +38,11 @@ public class Certificate extends Entity {
         return description;
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public int getDuration() {
+    public Integer getDuration() {
         return duration;
     }
 
@@ -72,20 +73,14 @@ public class Certificate extends Entity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         Certificate that = (Certificate) o;
-        return price == that.price
-                && duration == that.duration
-                && Objects.equals(name, that.name)
+        return Objects.equals(name, that.name)
                 && Objects.equals(description, that.description)
+                && Objects.equals(price, that.price)
+                && Objects.equals(duration, that.duration)
                 && Objects.equals(createDate, that.createDate)
                 && Objects.equals(lastUpdateDate, that.lastUpdateDate)
                 && Objects.equals(tags, that.tags);
@@ -101,12 +96,11 @@ public class Certificate extends Entity {
         private long id;
         private String name;
         private String description;
-        private int price;
-        private int duration;
+        private Integer price;
+        private Integer duration;
         private LocalDate createDate;
         private LocalDate lastUpdateDate;
         private List<Tag> tags;
-
 
         public Builder() {
             this.tags = new ArrayList<>();
@@ -132,13 +126,15 @@ public class Certificate extends Entity {
             if (StringUtils.isNotBlank(from.description)) {
                 builder.setDescription(from.description);
             }
-            if (from.duration != ZERO) {
+            if (Objects.nonNull(from.price)) {
+                builder.setPrice(from.price);
+            }
+            if (Objects.nonNull(from.duration) && from.duration != ZERO) {
                 builder.setDuration(from.duration);
             }
             if (CollectionUtils.isNotEmpty(from.tags)) {
                 builder.setTags(from.tags);
             }
-            builder.setPrice(from.price);
 
             return builder.build();
         }
@@ -158,12 +154,12 @@ public class Certificate extends Entity {
             return this;
         }
 
-        public Builder setPrice(int price) {
+        public Builder setPrice(Integer price) {
             this.price = price;
             return this;
         }
 
-        public Builder setDuration(int duration) {
+        public Builder setDuration(Integer duration) {
             this.duration = duration;
             return this;
         }
