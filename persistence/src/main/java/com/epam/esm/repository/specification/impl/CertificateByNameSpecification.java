@@ -15,7 +15,7 @@ public class CertificateByNameSpecification extends AbstractCertificateSpecifica
     }
 
     @Override
-    public Object[] getArgs() {
+    public Object[] getParameters() {
         return new Object[]{"%" + name + "%"};
     }
 }

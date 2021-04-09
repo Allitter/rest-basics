@@ -15,7 +15,7 @@ public class CertificateByDescriptionSpecification extends AbstractCertificateSp
     }
 
     @Override
-    public Object[] getArgs() {
+    public Object[] getParameters() {
         return new Object[]{"%" + description + "%"};
     }
 }

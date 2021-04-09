@@ -15,7 +15,7 @@ public class TagByNameSpecification extends AbstractTagSpecification {
     }
 
     @Override
-    public Object[] getArgs() {
+    public Object[] getParameters() {
         return new Object[]{name};
     }
 }

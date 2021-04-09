@@ -15,7 +15,7 @@ public class TagByIdSpecification extends AbstractTagSpecification {
     }
 
     @Override
-    public Object[] getArgs() {
+    public Object[] getParameters() {
         return new Object[]{id};
     }
 }

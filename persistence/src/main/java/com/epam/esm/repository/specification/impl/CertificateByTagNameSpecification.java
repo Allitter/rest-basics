@@ -15,7 +15,7 @@ public class CertificateByTagNameSpecification extends AbstractCertificateSpecif
     }
 
     @Override
-    public Object[] getArgs() {
+    public Object[] getParameters() {
         return new Object[]{"%" + tagName + "%"};
     }
 }

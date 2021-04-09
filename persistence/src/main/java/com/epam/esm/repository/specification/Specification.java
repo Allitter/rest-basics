@@ -27,5 +27,5 @@ public interface Specification<T extends Entity> {
      *
      * @return the array of specification parameters to prepare statement
      */
-    Object[] getArgs();
+    Object[] getParameters();
 }

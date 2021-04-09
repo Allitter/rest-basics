@@ -15,7 +15,7 @@ public class CertificateByIdSpecification extends AbstractCertificateSpecificati
     }
 
     @Override
-    public Object[] getArgs() {
+    public Object[] getParameters() {
         return new Object[]{id};
     }
 }

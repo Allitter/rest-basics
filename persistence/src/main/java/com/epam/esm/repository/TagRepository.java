@@ -2,7 +2,7 @@ package com.epam.esm.repository;
 
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.model.Tag;
-import com.epam.esm.repository.specification.SpecificationCompressor;
+import com.epam.esm.repository.specification.impl.SpecificationCompressorImpl;
 import com.epam.esm.repository.specification.impl.TagByIdSpecification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,7 +14,9 @@ public class TagRepository extends AbstractRepository<Tag> {
     private static final String INSERT_QUERY = "INSERT INTO tag (name) VALUES (?);";
     private static final String UPDATE_QUERY = "UPDATE tag SET name = ? WHERE id = ?;";
 
-    public TagRepository(JdbcTemplate jdbcTemplate, RowMapper<Tag> mapper, SpecificationCompressor<Tag> specificationCompressor) {
+    public TagRepository(JdbcTemplate jdbcTemplate, RowMapper<Tag> mapper,
+                         SpecificationCompressorImpl specificationCompressor) {
+
         super(jdbcTemplate, mapper, specificationCompressor);
     }
 

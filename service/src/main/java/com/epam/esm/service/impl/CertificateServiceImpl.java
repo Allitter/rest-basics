@@ -106,11 +106,6 @@ public class CertificateServiceImpl implements CertificateService {
         }
     }
 
-    @Override
-    public boolean remove(long id) {
-        return repository.remove(id);
-    }
-
     private List<Tag> ensureTagsInRepo(List<Tag> tags) {
         List<Tag> tagsCopy = new ArrayList<>(tags);
 
@@ -123,6 +118,11 @@ public class CertificateServiceImpl implements CertificateService {
         }
 
         return tagsCopy;
+    }
+
+    @Override
+    public boolean remove(long id) {
+        return repository.remove(id);
     }
 
     @Override

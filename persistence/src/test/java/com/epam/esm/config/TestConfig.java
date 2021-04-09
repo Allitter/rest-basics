@@ -1,12 +1,10 @@
 package com.epam.esm.config;
 
-import com.epam.esm.model.Certificate;
-import com.epam.esm.model.Tag;
 import com.epam.esm.repository.CertificateRepository;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.repository.mapper.CertificateMapper;
 import com.epam.esm.repository.mapper.TagMapper;
-import com.epam.esm.repository.specification.SpecificationCompressor;
+import com.epam.esm.repository.specification.impl.SpecificationCompressorImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +35,7 @@ public class TestConfig {
     }
 
     @Bean
-    public TagRepository tagRepository(SpecificationCompressor<Tag> specificationCompressor) {
+    public TagRepository tagRepository(SpecificationCompressorImpl specificationCompressor) {
         return new TagRepository(jdbcTemplate(), tagMapper(), specificationCompressor);
     }
 
@@ -52,7 +50,7 @@ public class TestConfig {
     }
 
     @Bean
-    public CertificateRepository certificateRepository(SpecificationCompressor<Certificate> specificationCompressor) {
+    public CertificateRepository certificateRepository(SpecificationCompressorImpl specificationCompressor) {
         return new CertificateRepository(jdbcTemplate(), certificateMapper(), tagMapper(), specificationCompressor);
     }
 }

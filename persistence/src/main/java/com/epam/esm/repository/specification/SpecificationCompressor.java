@@ -4,7 +4,19 @@ import com.epam.esm.model.Entity;
 
 import java.util.List;
 
-public interface SpecificationCompressor<T extends Entity> {
+/**
+ * Specification compressor.
+ *
+ */
+public interface SpecificationCompressor {
 
-    Specification<T> buildFrom(List<Specification<T>> specifications);
+    /**
+     * Build specification from list. Creates specification from another
+     * specifications by connecting conditions with "AND" operator
+     *
+     * @param <T>            the specification type parameter
+     * @param specifications the specifications
+     * @return built specification
+     */
+    <T extends Entity> Specification<T> buildFrom(List<Specification<T>> specifications);
 }

@@ -24,7 +24,6 @@ public class CertificateValidatorImpl implements CertificateValidator {
     private static final int MAX_NAME_LENGTH = 64;
     private static final int MIN_DURATION = 1;
     private static final int MIN_PRICE = 0;
-    private static final int ZERO = 0;
     private static final int MIN_DESCRIPTION_LENGTH = 2;
     private static final int MAX_DESCRIPTION_LENGTH = 255;
     private final TagValidator tagValidator;

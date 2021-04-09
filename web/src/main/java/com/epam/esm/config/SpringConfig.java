@@ -38,7 +38,6 @@ public class SpringConfig implements WebMvcConfigurer {
     public GsonHttpMessageConverter gsonHttpMessageConverter() {
         GsonHttpMessageConverter gsonConverter = new GsonHttpMessageConverter();
         gsonConverter.setGson(gson());
-
         return gsonConverter;
     }
 

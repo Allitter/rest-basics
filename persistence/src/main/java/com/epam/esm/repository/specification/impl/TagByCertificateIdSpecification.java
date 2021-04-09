@@ -15,7 +15,7 @@ public class TagByCertificateIdSpecification extends AbstractTagSpecification {
     }
 
     @Override
-    public Object[] getArgs() {
+    public Object[] getParameters() {
         return new Object[]{certificateId};
     }
 }

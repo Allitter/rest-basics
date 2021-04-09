@@ -11,6 +11,10 @@ public class ExceptionResponse {
         this.messages = new ArrayList<>(messages);
     }
 
+    public ExceptionResponse(int code, String messages) {
+        this(code, List.of(messages));
+    }
+
     public int getCode() {
         return code;
     }

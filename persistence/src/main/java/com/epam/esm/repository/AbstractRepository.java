@@ -3,7 +3,7 @@ package com.epam.esm.repository;
 import com.epam.esm.exception.RepositoryError;
 import com.epam.esm.model.Entity;
 import com.epam.esm.repository.specification.Specification;
-import com.epam.esm.repository.specification.SpecificationCompressor;
+import com.epam.esm.repository.specification.impl.SpecificationCompressorImpl;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -25,10 +25,10 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
     private static final int PREPARED_STATEMENT_PARAMETER_BIAS = 1;
     protected final JdbcTemplate jdbcTemplate;
     protected final RowMapper<T> mapper;
-    protected final SpecificationCompressor<T> specificationCompressor;
+    protected final SpecificationCompressorImpl specificationCompressor;
 
     protected AbstractRepository(JdbcTemplate jdbcTemplate, RowMapper<T> mapper,
-                                 SpecificationCompressor<T> specificationCompressor) {
+                                 SpecificationCompressorImpl specificationCompressor) {
         this.jdbcTemplate = jdbcTemplate;
         this.mapper = mapper;
         this.specificationCompressor = specificationCompressor;
@@ -56,17 +56,9 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
         return jdbcTemplate.update(query, id) == ONE_ROW_AFFECTED;
     }
 
-    protected abstract String getTableName();
-
     @Override
     public List<T> query(Specification<T> specification) {
-        return jdbcTemplate.query(specification.query(), mapper, specification.getArgs());
-    }
-
-    @Override
-    public Optional<T> queryFirst(Specification<T> specification) {
-        List<T> list = query(specification);
-        return list.isEmpty() ? Optional.empty() : Optional.of(list.get(FIRST_ELEMENT));
+        return jdbcTemplate.query(specification.query(), mapper, specification.getParameters());
     }
 
     @Override
@@ -80,8 +72,16 @@ public abstract class AbstractRepository<T extends Entity> implements MainReposi
     }
 
     @Override
+    public Optional<T> queryFirst(Specification<T> specification) {
+        List<T> list = query(specification);
+        return list.isEmpty() ? Optional.empty() : Optional.of(list.get(FIRST_ELEMENT));
+    }
+
+    @Override
     public boolean exists(Specification<?> specification) {
         String existsQuery = String.format(EXISTS_QUERY, specification.query());
-        return jdbcTemplate.queryForObject(existsQuery, Boolean.class, specification.getArgs());
+        return jdbcTemplate.queryForObject(existsQuery, Boolean.class, specification.getParameters());
     }
+
+    protected abstract String getTableName();
 }

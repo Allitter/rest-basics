@@ -25,7 +25,7 @@ public class GenericSpecification implements Specification {
     }
 
     @Override
-    public Object[] getArgs() {
+    public Object[] getParameters() {
         return args;
     }
 }

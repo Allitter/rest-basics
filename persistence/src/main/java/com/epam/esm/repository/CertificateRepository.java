@@ -3,7 +3,7 @@ package com.epam.esm.repository;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.model.Tag;
-import com.epam.esm.repository.specification.SpecificationCompressor;
+import com.epam.esm.repository.specification.impl.SpecificationCompressorImpl;
 import com.epam.esm.repository.specification.impl.CertificateByIdSpecification;
 import com.epam.esm.repository.specification.Specification;
 import com.epam.esm.repository.specification.impl.TagByCertificateIdSpecification;
@@ -19,15 +19,17 @@ import java.util.Optional;
 @Repository
 public class CertificateRepository extends AbstractRepository<Certificate> {
     private static final String TABLE_NAME = "certificate";
-    private static final String INSERT_QUERY = "INSERT INTO certificate (name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, ?, ?);";
-    private static final String UPDATE_QUERY = "UPDATE certificate SET name = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = ? WHERE id = ?;";
+    private static final String INSERT_QUERY = "INSERT INTO certificate " +
+            "(name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, ?, ?);";
+    private static final String UPDATE_QUERY = "UPDATE certificate SET name = ?, description = ?, price = ?, " +
+            "duration = ?, create_date = ?, last_update_date = ? WHERE id = ?;";
     private static final String ADD_TAG_QUERY = "INSERT INTO certificate_tag(id_certificate, id_tag) VALUES (?, ?);";
     private static final String REMOVE_CERTIFICATE_TAGS_QUERY = "DELETE FROM certificate_tag WHERE id_certificate = ?;";
 
     private final RowMapper<Tag> tagRowMapper;
 
     public CertificateRepository(JdbcTemplate jdbcTemplate, RowMapper<Certificate> mapper, RowMapper<Tag> tagRowMapper,
-                                 SpecificationCompressor<Certificate> specificationCompressor) {
+                                 SpecificationCompressorImpl specificationCompressor) {
         super(jdbcTemplate, mapper, specificationCompressor);
         this.tagRowMapper = tagRowMapper;
     }
@@ -86,7 +88,7 @@ public class CertificateRepository extends AbstractRepository<Certificate> {
 
     private List<Tag> getCertificateTags(long id) {
         Specification<Tag> tagSpecification = new TagByCertificateIdSpecification(id);
-        return jdbcTemplate.query(tagSpecification.query(), tagRowMapper, tagSpecification.getArgs());
+        return jdbcTemplate.query(tagSpecification.query(), tagRowMapper, tagSpecification.getParameters());
     }
 
     @Override
