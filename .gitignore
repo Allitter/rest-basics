@@ -1,7 +1,10 @@
 out
 target
+build
+.gradle
 *.class
 *.jar
+
 
 #IDEA
 *.iml
